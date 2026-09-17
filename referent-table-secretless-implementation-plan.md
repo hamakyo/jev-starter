@@ -1,0 +1,7 @@
+| 出典 | 目的 | 具体対象 | 役割 | 前後関係 | 候補語 | 初出定義 |
+| --- | --- | --- | --- | --- | --- | --- |
+| Issue #4〜#7、#9 | APIキーなしで機能と受け入れ条件を再現可能にする | `MockProvider`、非機密JSONL fixture、決定論的baseline、metrics、examples、RAG diagnosis、telemetry、failure injectionをoffline CIで実行する実装 | 手段 | Issue #3完了後に依存順で実装し、通常CIでは外部APIを呼ばない | offline実装範囲 | Offline実装範囲とは、秘密情報や外部サービスに依存せず、fixtureとtest doubleだけで機能・失敗経路・reportを検証できる範囲を指す。 |
+| Issue #5、#6、#9 | 後から実APIを同じ契約へ接続できるようにする | `TYPESAFE_API_KEY`などが存在するときだけ起動するlive runnerとprovider factoryを実装し、通常testから除外する処理 | 手段 | offline runnerと同じdataset・report contractを先に完成させた後に接続口だけ追加する | live接続口 | Live接続口とは、秘密情報をrepositoryへ保存せず、明示コマンドでのみ外部providerを生成する実行経路を指す。 |
+| Issue #8 | 公開直前までrepositoryの契約を整える | CONTRIBUTING、SECURITY、CHANGELOG、compatibility方針、release checklist、package/template候補比較 | 記録 | #5、#6、#7、#9の実装結果を確認した後、公開方式を決める前まで作成する | release準備範囲 | Release準備範囲とは、公開トークンを使わずに作成・検証できる文書、metadata候補、clean-checkout手順を指す。 |
+| Issue #8 | 公開物の法的・配布上の確定を行う | license選択、npm packageかGitHub templateかの選択、version確定、npm publishまたはrelease作成 | 開始条件 | offline実装とrelease準備の完了後、ユーザーの明示判断と必要な公開権限を得てから行う | 公開停止点 | 公開停止点とは、license・配布方式の判断または公開用credentialがなければ先へ進めない境界を指す。 |
+| 通常CI | 秘密情報がなくても回帰を検出する | install、typecheck、lint、unit test、offline eval、example smoke、RAG report snapshotを実行する品質ゲート | 手段 | 各Issueの実装と同時に追加し、live commandは実行しない | offline品質ゲート | Offline品質ゲートとは、外部通信とsecretを使わず、全機能の決定論的な成功・失敗経路を検証するCI条件を指す。 |

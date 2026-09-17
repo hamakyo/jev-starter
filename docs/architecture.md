@@ -81,6 +81,8 @@ Provider non-responsibilities:
 
 The provider rejects malformed SDK responses before they reach policy code: every requested answer must be present and match its question type, and choice/score/noul fields plus model and usage must have their required runtime shape.
 
+`MockProvider` implements the same boundary for offline work. It supports typed canned results, state/fixture scenarios, resolver and scripted steps, deterministic delay, abort/timeout injection, injected errors, and call-history inspection. Mock results pass the same normalized provider validator as live results.
+
 ### 3. Policy
 
 A policy maps model output to a route. The initial policy should support three explicit paths:
@@ -132,6 +134,14 @@ interface DecisionOutcome<TAnswers> {
 
 Every decision should be representable as a structured event without logging raw sensitive state by default.
 
+The implementation emits a discriminated `DecisionEvent` union:
+
+- `success` after provider success and policy application;
+- `provider-failure` when the primary provider rejects, including malformed responses;
+- `operational-fallback` with `status: "succeeded" | "failed"` when an explicitly configured fallback provider is attempted.
+
+Observer failures are ignored by default so telemetry cannot change decision behavior; callers may opt into `observerError: "throw"`. The event contains answer signals (confidence/probabilities), not the raw answer map or input state.
+
 Minimum metadata:
 
 - decision id/version;
@@ -141,9 +151,9 @@ Minimum metadata:
 - latency;
 - usage/cost inputs;
 - error category;
-- optional ground-truth/outcome id supplied later by the host.
+- optional ground-truth/outcome id supplied later by the host through a separate evaluation record.
 
-Raw `state` logging must be opt-in.
+Raw `state` is not included in the event contract. Applications must make any additional state logging an explicit, redacted host-side decision.
 
 ## Failure semantics
 
@@ -153,7 +163,7 @@ The engine must distinguish **uncertainty** from **operational failure**.
 - Timeout, authentication failure, malformed response, or provider outage is an operational error.
 - A provider failure must never be converted into a high-confidence `auto` decision.
 - A provider failure, including a malformed SDK response, rejects the engine call; no `DecisionOutcome` is created.
-- Applications may configure an operational fallback, but that fallback should be visible in telemetry.
+- Applications may configure an operational fallback. A successful fallback still applies the decision policy to the fallback answer and returns an outcome, while telemetry distinguishes it from a policy `fallback` route. If the fallback provider rejects, the engine rejects and emits a failed operational-fallback event.
 
 ## Side-effect rule
 

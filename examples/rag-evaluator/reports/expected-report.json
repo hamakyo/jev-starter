@@ -1,0 +1,7 @@
+{
+  "rows": 8,
+  "jevOverallAccuracy": 1,
+  "cascadeFallbackRate": 0.125,
+  "contextSufficiencyAccuracy": 1,
+  "correctnessCount": 7
+}

@@ -4,6 +4,7 @@ export type {
   AnswersFor,
   DecisionDefinition,
   DecisionDefinitionInput,
+  DecisionEngineOptions,
   DecisionOptions,
   DecisionOutcome,
   DecisionProvider,

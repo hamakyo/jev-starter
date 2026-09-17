@@ -1,156 +1,42 @@
 import type { Questions } from "@typesafe-ai/sdk";
+import { validateAnswers } from "./validate-answers.js";
 
 /** Validate the runtime shape returned by TypeSafe before it reaches policy code. */
 export function validateSystemOneResult<Q extends Questions>(questions: Q, result: unknown): void {
   const response = asRecord(result, "response");
-  const model = requiredField(response, "model", "response");
+  validateModel(response, "response");
+  validateAnswers(questions, requiredField(response, "answers", "response"), "response.answers");
+  validateSdkUsage(requiredField(response, "usage", "response"));
+}
+
+/** Validate the normalized provider result before it reaches policy code. */
+export function validateProviderResult<Q extends Questions>(questions: Q, result: unknown): void {
+  const providerResult = asRecord(result, "providerResult");
+  validateModel(providerResult, "providerResult");
+  validateAnswers(
+    questions,
+    requiredField(providerResult, "answers", "providerResult"),
+    "providerResult.answers",
+  );
+
+  const latencyMs = requiredField(providerResult, "latencyMs", "providerResult");
+  if (typeof latencyMs !== "number" || !Number.isFinite(latencyMs) || latencyMs < 0) {
+    malformed("providerResult.latencyMs", "must be a finite non-negative number");
+  }
+
+  if (hasOwn(providerResult, "usage") && providerResult.usage !== undefined) {
+    validateProviderUsage(providerResult.usage);
+  }
+}
+
+function validateModel(record: Record<string, unknown>, path: string): void {
+  const model = requiredField(record, "model", path);
   if (typeof model !== "string" || model.trim().length === 0) {
-    malformed("response.model", "must be a non-empty string");
-  }
-
-  const answers = asRecord(requiredField(response, "answers", "response"), "response.answers");
-  const questionRecord = asRecord(questions, "request.questions");
-  const questionNames = Object.keys(questionRecord);
-
-  for (const name of questionNames) {
-    if (!hasOwn(answers, name)) {
-      malformed(`response.answers.${name}`, "is missing");
-    }
-    const question = asRecord(questionRecord[name], `request.questions.${name}`);
-    validateQuestionDefinition(question, `request.questions.${name}`);
-    validateAnswer(question, answers[name], `response.answers.${name}`);
-  }
-
-  for (const name of Object.keys(answers)) {
-    if (!hasOwn(questionRecord, name)) {
-      malformed(`response.answers.${name}`, "does not correspond to a requested question");
-    }
-  }
-
-  validateUsage(requiredField(response, "usage", "response"));
-}
-
-function validateQuestionDefinition(value: unknown, path: string): void {
-  const question = asRecord(value, path);
-  const type = requiredField(question, "type", path);
-  if (typeof type !== "string") {
-    malformed(`${path}.type`, "must be a string");
-  }
-
-  switch (type) {
-    case "noul":
-      return;
-    case "choice": {
-      const criteria = asRecord(requiredField(question, "criteria", path), `${path}.criteria`);
-      if (Object.keys(criteria).length === 0) {
-        malformed(`${path}.criteria`, "must contain at least one label");
-      }
-      return;
-    }
-    case "score": {
-      const criteria = requiredField(question, "criteria", path);
-      if (!Array.isArray(criteria) || criteria.length < 2) {
-        malformed(`${path}.criteria`, "must contain at least two rubric entries");
-      }
-      return;
-    }
-    default:
-      malformed(`${path}.type`, 'must be "noul", "choice", or "score"');
+    malformed(`${path}.model`, "must be a non-empty string");
   }
 }
 
-function validateAnswer(question: Record<string, unknown>, value: unknown, path: string): void {
-  const answer = asRecord(value, path);
-  const type = requiredField(answer, "type", path);
-
-  switch (question.type) {
-    case "noul":
-      if (type !== "noul") {
-        malformed(`${path}.type`, 'must be "noul" for a noul question');
-      }
-      assertProbability(requiredField(answer, "noul", path), `${path}.noul`);
-      return;
-    case "choice":
-      validateChoiceAnswer(question, answer, path, type);
-      return;
-    case "score":
-      validateScoreAnswer(question, answer, path, type);
-      return;
-    default:
-      malformed(`${path}.type`, "cannot be validated for an unknown question type");
-  }
-}
-
-function validateChoiceAnswer(
-  question: Record<string, unknown>,
-  answer: Record<string, unknown>,
-  path: string,
-  type: unknown,
-): void {
-  if (type !== "choice") {
-    malformed(`${path}.type`, 'must be "choice" for a choice question');
-  }
-  const criteria = asRecord(question.criteria, "question.criteria");
-  const labels = Object.keys(criteria);
-  const selected = requiredField(answer, "choice", path);
-  if (typeof selected !== "string" || !hasOwn(criteria, selected)) {
-    malformed(`${path}.choice`, "must be one of the labels in the question criteria");
-  }
-  assertProbability(requiredField(answer, "confidence", path), `${path}.confidence`);
-  validateProbabilityMap(
-    requiredField(answer, "probabilities", path),
-    labels,
-    `${path}.probabilities`,
-  );
-}
-
-function validateScoreAnswer(
-  question: Record<string, unknown>,
-  answer: Record<string, unknown>,
-  path: string,
-  type: unknown,
-): void {
-  if (type !== "score") {
-    malformed(`${path}.type`, 'must be "score" for a score question');
-  }
-  const criteria = question.criteria;
-  if (!Array.isArray(criteria)) {
-    malformed("question.criteria", "must be a rubric array");
-  }
-  const indexes = criteria.map((_, index) => String(index));
-  assertFiniteNumber(requiredField(answer, "score", path), `${path}.score`);
-  assertProbability(requiredField(answer, "confidence", path), `${path}.confidence`);
-  validateScoreLegend(requiredField(answer, "legend", path), criteria, `${path}.legend`);
-  validateProbabilityMap(
-    requiredField(answer, "probabilities", path),
-    indexes,
-    `${path}.probabilities`,
-  );
-}
-
-function validateScoreLegend(value: unknown, criteria: unknown[], path: string): void {
-  const legend = asRecord(value, path);
-  const indexes = criteria.map((_, index) => String(index));
-
-  for (const [index, key] of indexes.entries()) {
-    const actual = requiredField(legend, key, path);
-    if (actual === undefined) {
-      malformed(`${path}.${key}`, "must not be undefined");
-    }
-
-    const expected = criteria[index];
-    if (expected === undefined) {
-      malformed(`${path}.${key}`, "cannot match an undefined question criterion");
-    }
-    if (!deepEqualJson(actual, expected)) {
-      malformed(`${path}.${key}`, "must match the corresponding question criterion");
-    }
-  }
-
-  rejectUnexpectedKeys(legend, indexes, path);
-}
-
-function validateUsage(value: unknown): void {
+function validateSdkUsage(value: unknown): void {
   const usage = asRecord(value, "response.usage");
   assertNonNegativeInteger(
     requiredField(usage, "input_tokens", "response.usage"),
@@ -162,64 +48,16 @@ function validateUsage(value: unknown): void {
   );
 }
 
-function validateProbabilityMap(value: unknown, keys: string[], path: string): void {
-  const probabilities = asRecord(value, path);
-  for (const key of keys) {
-    assertProbability(requiredField(probabilities, key, path), `${path}.${key}`);
-  }
-  rejectUnexpectedKeys(probabilities, keys, path);
-}
-
-function rejectUnexpectedKeys(
-  record: Record<string, unknown>,
-  expectedKeys: string[],
-  path: string,
-): void {
-  const expected = new Set(expectedKeys);
-  for (const key of Object.keys(record)) {
-    if (!expected.has(key)) {
-      malformed(`${path}.${key}`, "is not part of the requested question definition");
-    }
-  }
-}
-
-function deepEqualJson(left: unknown, right: unknown): boolean {
-  if (Object.is(left, right)) {
-    return true;
-  }
-
-  if (Array.isArray(left) || Array.isArray(right)) {
-    if (!Array.isArray(left) || !Array.isArray(right) || left.length !== right.length) {
-      return false;
-    }
-    return left.every((value, index) => deepEqualJson(value, right[index]));
-  }
-
-  if (isRecord(left) || isRecord(right)) {
-    if (!isRecord(left) || !isRecord(right)) {
-      return false;
-    }
-    const leftKeys = Object.keys(left);
-    const rightKeys = Object.keys(right);
-    if (leftKeys.length !== rightKeys.length) {
-      return false;
-    }
-    return leftKeys.every((key) => hasOwn(right, key) && deepEqualJson(left[key], right[key]));
-  }
-
-  return false;
-}
-
-function assertProbability(value: unknown, path: string): asserts value is number {
-  if (typeof value !== "number" || !Number.isFinite(value) || value < 0 || value > 1) {
-    malformed(path, "must be a finite number between 0 and 1");
-  }
-}
-
-function assertFiniteNumber(value: unknown, path: string): asserts value is number {
-  if (typeof value !== "number" || !Number.isFinite(value)) {
-    malformed(path, "must be a finite number");
-  }
+function validateProviderUsage(value: unknown): void {
+  const usage = asRecord(value, "providerResult.usage");
+  assertNonNegativeInteger(
+    requiredField(usage, "inputTokens", "providerResult.usage"),
+    "providerResult.usage.inputTokens",
+  );
+  assertNonNegativeInteger(
+    requiredField(usage, "outputTokens", "providerResult.usage"),
+    "providerResult.usage.outputTokens",
+  );
 }
 
 function assertNonNegativeInteger(value: unknown, path: string): asserts value is number {
@@ -232,7 +70,7 @@ function asRecord(value: unknown, path: string): Record<string, unknown> {
   if (!isRecord(value)) {
     malformed(path, "must be an object");
   }
-  return value as Record<string, unknown>;
+  return value;
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -251,5 +89,5 @@ function hasOwn(record: Record<string, unknown>, key: string): boolean {
 }
 
 function malformed(path: string, reason: string): never {
-  throw new TypeError(`Malformed TypeSafe SDK response at ${path}: ${reason}`);
+  throw new TypeError(`Malformed provider response at ${path}: ${reason}`);
 }

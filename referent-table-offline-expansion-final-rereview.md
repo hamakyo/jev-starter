@@ -1,0 +1,6 @@
+| 出典 | 目的 | 具体対象 | 役割 | 前後関係 | 候補語 | 初出定義 |
+| --- | --- | --- | --- | --- | --- | --- |
+| 前回baseline component指摘 | evaluator自身が返した値だけを品質指標として表示しているか判定する | component judgmentを返さないbaselineと、そのbaselineを使うcomparison・cascade reportからcomponent metricsを除外する実装 | 記録 | baseline prediction生成後、component report付与前に有無を確定する | component metric出典 | Component metric出典とは、accuracy・Brier・ECEの計算に使ったjudgmentを実際に返したevaluatorを指す。 |
+| 前回primary resolved指摘 | primary成功・fallback移行・primary失敗の割合が実行結果と一致するか判定する | primary成功かつfallback不要の行だけを数えるprimaryResolvedRateと、primary failure行を数えるprimaryFailureRate | 値 | primary全行実行後、fallback対象決定後に各割合を算出する | cascade結果割合 | Cascade結果割合とは、全dataset行に対するprimary正常完了、fallback移行、primary失敗の各比率を指す。 |
+| 前回decision identity指摘 | reference有無で異なるquestion集合を履歴から特定できるか判定する | variant別decision ID、各観測のdecisionVariant、複数variantを含むreport metadataのmixed値 | 記録 | stateからvariantを選択後、provider実行時とreport生成時に記録する | decision variant記録 | Decision variant記録とは、reference有無により選択されたdecision contractと、reportが単一または混在variantかを示す情報を指す。 |
+| ユーザーの対応完了報告 | Issue #5・#9を含むsecret不要実装の完了可否を最終判定する | 前回3指摘の修正、53 tests、offline report、package検査、live preflightを再確認したレビュー所見 | 記録 | 対応表作成後、コード確認・再現・全コマンド実行後に提示する | 最終再レビュー所見 | 最終再レビュー所見とは、未解消の重要指摘と検証結果に基づくマージ可否の判定を指す。 |

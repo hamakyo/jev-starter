@@ -1,0 +1,7 @@
+| 出典 | 目的 | 具体対象 | 役割 | 前後関係 | 候補語 | 初出定義 |
+| --- | --- | --- | --- | --- | --- | --- |
+| Issue #4 | secretなしで同じprovider成功・失敗を再現できるか判定する | 型付きcanned answer、scripted response、timeout、abort、error、呼び出し履歴を既存Provider契約で提供する実装 | 手段 | core実装後、eval・examples・RAG・observabilityより先に利用する | offline provider | Offline providerとは、外部通信なしで正規化済みprovider結果とoperational failureを決定論的に返す実装を指す。 |
+| Issue #5・#6・#9 | 同じfixtureから品質・選択的自動化・cascadeを再現可能に評価する | JSONL loader、metrics、runner、report、3つの小例、RAG atomic judgmentsとdeterministic diagnosis | 手段 | offline providerの後に構築し、通常CIで全経路を実行する | offline評価経路 | Offline評価経路とは、非機密fixtureと決定論的providerだけでpredictionからreportまで生成する処理を指す。 |
+| Issue #7 | valid uncertaintyとoperational failureを区別して観測・fallbackできるか判定する | stateを含まないdecision event、error category、abort/timeout伝播、primary failure後の明示的fallback | 手段 | provider実行とpolicy適用の前後で事象を発行し、業務副作用は実行しない | operational fallback | Operational fallbackとは、低confidenceのpolicy routeではなく、provider障害を開始条件として別providerへ移る実行経路を指す。 |
+| Issue #8 | 公開前のpackage contractがclean checkoutで再現できるか判定する | exports、build artifact、pack内容、clean-install、公開API、compatibility、security、contribution、release文書 | 記録 | examplesとfailure semanticsでAPIを検証した後、license・配布方式・公開操作より前に確認する | release準備成果物 | Release準備成果物とは、公開credentialを使わずに生成・検査できるpackageとrepository文書を指す。 |
+| ユーザーの実装完了報告 | merge前に受け入れ条件違反と回帰を特定する | offline/live分離、metric定義、report再現性、公開型、fallback安全性、CI・package検査を重要度順に示すレビュー所見 | 記録 | 差分・コマンド・生成物を確認した後に提示する | 拡張実装レビュー所見 | 拡張実装レビュー所見とは、Issue #4〜#9の実装について再現条件・影響・修正位置を示す指摘を指す。 |

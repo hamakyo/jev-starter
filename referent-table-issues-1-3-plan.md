@@ -1,0 +1,7 @@
+| 出典 | 目的 | 具体対象 | 役割 | 前後関係 | 候補語 | 初出定義 |
+| --- | --- | --- | --- | --- | --- | --- |
+| Issue #1 | 後続実装を再現可能に検証する | Node.js 20 以上、pnpm、strict TypeScript、Biome、Vitest、GitHub Actions から成る開発・検証基盤 | 手段 | 最初に整備し、Issue #2 と #3 の型検査・テストを支える | ワークスペース基盤 | ワークスペース基盤とは、ソース本体ではなく、インストール・型検査・lint・テスト・CI を同じ条件で実行するための設定一式を指す。 |
+| Issue #2 / `@typesafe-ai/sdk` 0.6.0 | TypeSafe SDK の型と通信責務を保ったままコアから呼び出す | `TypeSafeClient.systemOne()` に state・questions・request options を渡し、typed answers・model・usage・latency を返す薄いアダプター | 手段 | ワークスペース基盤の後に実装し、Decision Engine から利用する | Jev provider | Jev provider とは、公式 SDK の認証・retry・HTTP を再実装せず、コアが必要とする入出力と計測値だけを橋渡しするアダプターを指す。 |
+| Issue #3 / `docs/decision-contract.md` | 同じ判断定義を再生・比較可能にする | stable id、version、型付き questions、policy をひとまとまりにした値 | 記録 | provider 実装後に定義し、実行時 state と組み合わせる | decision definition | Decision definition とは、判断の識別子・版・質問・ルーティング規則を固定した、実行時 state を含まない定義を指す。 |
+| Issue #3 / policy acceptance criteria | モデルの確率を副作用ではなく明示的な経路へ変換する | 指定した一つの回答、または全回答を受け取る custom policy を `auto`・`fallback`・`review` のいずれかへ写像する処理 | 手段 | provider の成功結果だけに適用し、複数回答を暗黙集約しない | route policy | Route policy とは、対象回答と閾値または明示的な custom 関数から、ホストが次に取る経路だけを決める純粋な処理を指す。 |
+| Issue #3 / output contract | ホストが判断根拠を失わず次の処理を選べるようにする | decision id/version、route、完全な typed answer map、model、latency、usage を含む戻り値 | 値 | provider 成功後に policy を適用して返し、provider 失敗時には生成しない | decision outcome | Decision outcome とは、provider の成功結果と route policy の結果をまとめた、業務副作用を実行しない戻り値を指す。 |

@@ -1,0 +1,4 @@
+{"id":"judge-001","state":{"fixtureId":"judge-001","probability":0.97},"expected":"pass"}
+{"id":"judge-002","state":{"fixtureId":"judge-002","probability":0.03},"expected":"fail"}
+{"id":"judge-003","state":{"fixtureId":"judge-003","probability":0.50},"expected":"pass"}
+{"id":"judge-004","state":{"fixtureId":"judge-004","probability":0.96},"expected":"fail"}

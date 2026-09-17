@@ -1,0 +1,4 @@
+{"id":"support-001","state":{"fixtureId":"support-001","category":"billing","confidence":0.96},"expected":"billing"}
+{"id":"support-002","state":{"fixtureId":"support-002","category":"technical","confidence":0.70},"expected":"technical"}
+{"id":"support-003","state":{"fixtureId":"support-003","category":"other","confidence":0.40},"expected":"other"}
+{"id":"support-004","state":{"fixtureId":"support-004","category":"billing","confidence":0.92},"expected":"technical"}

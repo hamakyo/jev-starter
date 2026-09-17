@@ -1,9 +1,25 @@
 {
   "name": "jev-starter",
   "version": "0.1.0",
-  "private": true,
   "type": "module",
   "packageManager": "pnpm@9.15.4",
+  "description": "Typed, policy-driven decision workflows on top of the TypeSafe AI Jev SDK",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hamakyo/jev-starter.git"
+  },
+  "homepage": "https://github.com/hamakyo/jev-starter",
+  "files": ["dist", "README.md", "docs", "CHANGELOG.md", "CONTRIBUTING.md", "SECURITY.md"],
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
+  "sideEffects": false,
   "engines": {
     "node": ">=20"
   },
@@ -11,13 +27,24 @@
     "typecheck": "tsc --noEmit",
     "lint": "biome check .",
     "format": "biome format --write .",
-    "test": "vitest run"
+    "test": "vitest run",
+    "build": "tsc -p tsconfig.build.json",
+    "eval:offline": "tsx evals/runners/run-offline.ts",
+    "eval:live": "tsx evals/runners/run-live.ts",
+    "examples:offline": "tsx examples/run-offline.ts",
+    "examples:live": "tsx examples/run-live.ts",
+    "rag:offline": "tsx examples/rag-evaluator/evals/run-offline.ts",
+    "rag:live": "tsx examples/rag-evaluator/evals/run-live.ts",
+    "pack:check": "pnpm build && node scripts/check-pack.mjs",
+    "package:check": "pnpm build && node scripts/check-package.mjs"
   },
   "dependencies": {
     "@typesafe-ai/sdk": "0.6.0"
   },
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",
+    "@types/node": "22.12.0",
+    "tsx": "4.19.2",
     "typescript": "^5.7.2",
     "vitest": "^4.0.0"
   }

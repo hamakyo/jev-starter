@@ -25,7 +25,7 @@ Reference answer (optional) -+              v
                                            judge
 ```
 
-The first release should keep answer generation and business side effects outside the evaluator.
+The implemented basic mode keeps answer generation and business side effects outside the evaluator.
 
 ## Evaluation dimensions
 
@@ -46,7 +46,14 @@ Evaluate retrieval separately from generation.
 - `contradiction`: whether the answer contradicts retrieved evidence;
 - `correctness`: whether the answer is consistent with a reference answer when one is available.
 
-Reference-dependent metrics must remain optional so the evaluator can also operate on datasets without reference answers.
+Reference-dependent metrics must remain optional so the evaluator can also operate on datasets without reference answers. When a reference is absent, the correctness question is omitted from the decision definition and from the component report; it is not replaced with a guessed probability.
+
+The reference-aware and reference-free definitions have distinct decision IDs.
+Each Jev observation also records `decisionId`, `decisionVersion`, and a
+`decisionVariant` (`with-reference` or `without-reference`); a mixed-dataset
+report uses `decisionVariant: "mixed"` at the report level. The report-level
+value is derived from the set of row variants: all reference-bearing rows,
+all reference-free rows, or both.
 
 ## Basic and advanced groundedness modes
 
@@ -78,7 +85,7 @@ host / LLM claim extraction
   +-- claim 3 ----> Jev support probability
 ```
 
-Claim extraction is deliberately not part of the Jev decision contract because it is a generation task. The showcase should make this boundary explicit rather than pretending Jev replaces every LLM step.
+Claim extraction is deliberately not part of the Jev decision contract because it is a generation task. The showcase makes this boundary explicit rather than pretending Jev replaces every LLM step. A `ClaimExtractor` interface is reserved for a later host/LLM extension; basic mode does not implement claim extraction.
 
 ## Do not collapse everything into one RAG score
 
@@ -137,7 +144,7 @@ if (
 }
 ```
 
-The real policy must be selected from eval data, not copied from documentation examples.
+The current fixture policy uses explicit thresholds selected for the committed offline fixture. They are examples, not universal safety values; real thresholds must be selected from task-specific evaluation data.
 
 ## Two-sided confidence policy
 
@@ -155,7 +162,7 @@ For example, with symmetric thresholds, `<= 0.05` may be an auto-fail candidate 
 
 ## Cascade mode
 
-The showcase should support three comparable modes on the same dataset:
+The showcase supports three comparable modes on the same dataset:
 
 1. **Jev-only** — atomic Jev judgments and deterministic policy;
 2. **baseline judge** — an existing LLM-as-a-Judge or other evaluator;
@@ -167,7 +174,7 @@ This is the core deployment question the showcase should answer:
 
 ## Dataset
 
-Planned fixture shape:
+The committed fixture shape is:
 
 ```json
 {
@@ -179,18 +186,30 @@ Planned fixture shape:
   ],
   "answer": "...",
   "referenceAnswer": "...",
-  "labels": {
-    "contextSufficient": true,
-    "answerGrounded": false
+  "expected": {
+    "diagnosis": "PASS",
+    "retrieval": {
+      "chunkRelevance": { "c1": true, "c2": true },
+      "contextSufficiency": true,
+      "contextConflict": false
+    },
+    "generation": {
+      "answerRelevance": true,
+      "groundedness": true,
+      "contradiction": false,
+      "correctness": true
+    }
   }
 }
 ```
 
-The exact schema may evolve, but ground-truth labels must be explicit and versioned. Datasets committed to the repository must be non-sensitive.
+`expected.generation.correctness` is present only for rows with a
+`referenceAnswer`. Ground-truth labels are explicit and versioned, and
+datasets committed to the repository must be non-sensitive.
 
 ## Metrics
 
-The showcase should reuse the generic eval harness and add RAG-specific slices.
+The Jev-only report reuses the generic eval harness and preserves its RAG component judgments in each successful observation's metadata. It also emits `componentMetrics.retrieval` and `componentMetrics.generation`; every available judgment reports count, accuracy, Brier score, and weighted ECE. Correctness metrics contain only reference-bearing rows. The deterministic baseline currently returns only a final diagnosis and confidence, so baseline and mixed cascade reports intentionally omit component metrics instead of relabeling Jev probabilities as baseline output.
 
 Minimum metrics:
 
@@ -202,13 +221,14 @@ Minimum metrics:
 - risk-coverage curve and AURC where meaningful;
 - cascade fallback rate;
 - end-to-end quality after fallback;
+- retrieval and generation component accuracy, Brier score, and ECE;
 - latency p50 / p95;
 - failure rate;
 - estimated cost using a versioned pricing snapshot.
 
 Report metrics separately for retrieval and generation dimensions. A single aggregate score may be provided as a secondary convenience metric only if its formula is explicit and the component metrics remain visible.
 
-## Planned layout
+## Implemented layout
 
 ```text
 examples/
@@ -219,18 +239,20 @@ examples/
       generation.ts
       diagnosis.ts
       policy.ts
+      component-metrics.ts
     evals/
       dataset.jsonl
-      run.ts
+      run-offline.ts
+      run-live.ts
     reports/
-      .gitkeep
+      expected-report.json
 ```
 
 Reusable metrics and provider comparison logic belong under the repository-level `evals/` package rather than being duplicated inside the showcase.
 
 ## Acceptance principles
 
-The showcase is successful when it can:
+The showcase is considered complete for basic mode because it can:
 
 - distinguish retrieval failure from generation failure on labeled examples;
 - preserve per-dimension probabilities rather than emit only one opaque RAG score;
@@ -238,5 +260,5 @@ The showcase is successful when it can:
 - measure Jev-only, baseline-only, and cascade modes on identical data;
 - demonstrate calibration and risk/coverage rather than rely on raw confidence values;
 - run deterministically offline with `MockProvider` in normal CI;
-- run live Jev evaluation only when explicitly requested;
+- run live Jev evaluation only when explicitly requested (the command is provided but not executed here);
 - state clearly that type-safe output does not imply semantically infallible judgment.

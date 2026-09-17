@@ -63,6 +63,8 @@ The engine combines the runtime state with the contract's questions, calls the c
 
 The implementation exposes `defineDecision()`, `DecisionEngine.decide()`, and the provider/policy types described above. The important invariant is that policy semantics are explicit and versioned with the decision.
 
+`DecisionEngine` also accepts optional observability and operational-fallback settings. Observability is a callback over `success`, `provider-failure`, and `operational-fallback` events. Operational fallback is an explicit provider wrapper at the engine boundary; it is never inferred from a policy route and it never performs a business side effect.
+
 ## Why questions live in the contract
 
 Questions and criteria define task semantics. If they change, historical metrics may no longer be comparable. Keeping them in a versioned definition allows:
@@ -148,6 +150,9 @@ interface DecisionOutcome<TAnswers> {
 5. Multiple answers are never silently collapsed into one confidence value.
 6. Raw state is not retained by the core engine after the call unless the host explicitly adds persistence.
 7. Provider-specific metadata may be attached, but core policy code should depend only on documented normalized fields.
+8. Observability events contain decision metadata and numeric answer signals, not raw state or raw answer objects.
+9. Observer failures are ignored by default; `observerError: "throw"` is an explicit opt-in.
+10. A configured operational fallback is attempted only according to its explicit `when` predicate (when supplied), and a failed fallback still rejects.
 
 ## Example: support routing
 

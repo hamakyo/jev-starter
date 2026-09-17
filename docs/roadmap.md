@@ -26,7 +26,7 @@ The current execution order is intentionally dependency-driven:
 - [x] Define RAG evaluator showcase design.
 - [x] Document implementation milestones.
 - [ ] Select license.
-- [ ] Add contribution and security guidance before wider external contribution.
+- [x] Add contribution and security guidance before wider external contribution.
 
 ## M1 — Runnable core
 
@@ -38,7 +38,7 @@ The current execution order is intentionally dependency-driven:
 - [x] Implement `defineDecision()` and typed `DecisionEngine`.
 - [x] Implement one-sided confidence policy.
 - [x] Implement two-sided binary-band policy for `noul` judgments.
-- [ ] Add `MockProvider` for deterministic tests.
+- [x] Add `MockProvider` for deterministic tests.
 - [x] Validate policy and contract invariants.
 - [x] Unit tests for provider, policy, and failure semantics.
 
@@ -48,17 +48,17 @@ The current execution order is intentionally dependency-driven:
 
 **Goal:** thresholds can be selected from evidence instead of intuition.
 
-- [ ] JSONL fixture loader.
-- [ ] Classification metrics and confusion matrix.
-- [ ] Brier score and calibration report.
-- [ ] One-sided threshold sweep with coverage/risk metrics.
-- [ ] Two-sided binary threshold sweep with positive/negative/fallback coverage.
-- [ ] Risk-coverage curve and AURC where meaningful.
-- [ ] Latency and failure-rate reporting.
-- [ ] Versioned pricing snapshot + estimated cost calculation.
-- [ ] Provider/baseline comparison runner.
-- [ ] Jev -> fallback-provider cascade evaluation.
-- [ ] Machine-readable JSON result plus human-readable console/Markdown summary.
+- [x] JSONL fixture loader.
+- [x] Classification metrics and confusion matrix.
+- [x] Brier score and calibration report.
+- [x] One-sided threshold sweep with coverage/risk metrics.
+- [x] Two-sided binary threshold sweep with positive/negative/fallback coverage.
+- [x] Risk-coverage curve and AURC where meaningful.
+- [x] Latency and failure-rate reporting.
+- [x] Versioned pricing snapshot + estimated cost calculation.
+- [x] Provider/baseline comparison runner.
+- [x] Jev -> fallback-provider cascade evaluation.
+- [x] Machine-readable JSON result plus human-readable console/Markdown summary.
 
 **Exit criterion:** one command can compare Jev with a baseline on the same labeled dataset and show the automation trade-off across thresholds, including cascade behavior.
 
@@ -66,9 +66,9 @@ The current execution order is intentionally dependency-driven:
 
 **Goal:** teach the primitives with small examples before introducing a larger showcase.
 
-- [ ] `support-routing`: multi-class ticket routing.
-- [ ] `agent-decision-gate`: choose continue/tool/fallback/review/stop behavior from agent state.
-- [ ] `llm-judge`: use Jev as a guard/judge signal around generated output and demonstrate binary-band policy.
+- [x] `support-routing`: multi-class ticket routing.
+- [x] `agent-decision-gate`: choose continue/tool/fallback/review/stop behavior from agent state.
+- [x] `llm-judge`: use Jev as a guard/judge signal around generated output and demonstrate binary-band policy.
 
 Each example must include:
 
@@ -87,24 +87,24 @@ See [RAG evaluator showcase](rag-evaluator.md) and [#9](https://github.com/hamak
 
 ### Retrieval evaluation
 
-- [ ] Per-chunk relevance.
-- [ ] Context-set sufficiency.
-- [ ] Evidence conflict detection.
+- [x] Per-chunk relevance.
+- [x] Context-set sufficiency.
+- [x] Evidence conflict detection.
 
 ### Generation evaluation
 
-- [ ] Answer relevance.
-- [ ] Answer-level groundedness.
-- [ ] Contradiction detection.
-- [ ] Optional reference-based correctness.
+- [x] Answer relevance.
+- [x] Answer-level groundedness.
+- [x] Contradiction detection.
+- [x] Optional reference-based correctness.
 
 ### Diagnosis and cascade
 
-- [ ] Deterministic TypeScript diagnosis from component probabilities.
-- [ ] Keep component scores visible instead of collapsing everything into one opaque RAG score.
-- [ ] Compare Jev-only vs baseline judge vs Jev -> fallback judge cascade.
-- [ ] Report calibration, coverage/risk, AURC, latency, and cost.
-- [ ] Add optional host/LLM claim extraction -> Jev claim verification extension after basic mode works.
+- [x] Deterministic TypeScript diagnosis from component probabilities.
+- [x] Keep component scores visible instead of collapsing everything into one opaque RAG score.
+- [x] Compare Jev-only vs baseline judge vs Jev -> fallback judge cascade.
+- [x] Report calibration, coverage/risk, AURC, latency, and cost.
+- [ ] Implement optional host/LLM claim extraction -> Jev claim verification extension after basic mode works.
 
 **Exit criterion:** the same labeled dataset can distinguish retrieval failures from generation failures and quantify when a Jev-first cascade can avoid fallback judging at an acceptable measured risk.
 
@@ -112,24 +112,26 @@ See [RAG evaluator showcase](rag-evaluator.md) and [#9](https://github.com/hamak
 
 **Goal:** make the starter safe to embed in real services.
 
-- [ ] Structured decision events / observability hooks.
-- [ ] Redaction-safe logging guidance.
-- [ ] Abort/timeout propagation tests.
-- [ ] Operational fallback semantics.
+- [x] Structured decision events / observability hooks.
+- [x] Redaction-safe logging guidance.
+- [x] Abort/timeout propagation tests.
+- [x] Operational fallback semantics.
 - [x] Typed custom/multi-question policy callback.
 - [ ] Per-label or cost-sensitive policies.
 - [ ] Decision version comparison in evals.
-- [ ] CI for lint, typecheck, unit tests, and offline evals.
+- [x] CI for lint, typecheck, unit tests, and offline evals.
 
 ## M6 — First public release
 
 **Goal:** freeze the smallest useful API only after examples, evals, and the RAG showcase exercise it.
 
-- [ ] Review public API surface for unnecessary abstraction.
-- [ ] Add `CONTRIBUTING.md`, `SECURITY.md`, changelog, and release process.
-- [ ] Add package metadata and chosen license.
-- [ ] Publish `v0.1.0` or mark the repository as a template, depending on which distribution model proves more useful.
-- [ ] Document migration notes for breaking upstream SDK changes.
+- [x] Review public API surface for unnecessary abstraction.
+- [x] Add `CONTRIBUTING.md`, `SECURITY.md`, changelog, and release process.
+- [x] Add package metadata; license selection remains open.
+- [ ] Select npm package, GitHub template, or both.
+- [ ] Select the release version/tag.
+- [ ] Publish the package or GitHub Release.
+- [x] Document migration notes for breaking upstream SDK changes.
 
 ## Deliberately deferred
 

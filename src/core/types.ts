@@ -1,4 +1,5 @@
 import type { EntryType, Questions } from "@typesafe-ai/sdk";
+import type { DecisionEngineOptions } from "../observability/types.js";
 import type { DecisionPolicy, DecisionRoute } from "../policies/types.js";
 import type { AnswersFor, Provider } from "../providers/types.js";
 
@@ -25,6 +26,9 @@ export interface DecisionOptions {
   signal?: AbortSignal;
   timeout?: number;
 }
+
+/** Observer and operational-fallback configuration for a decision engine. */
+export type { DecisionEngineOptions };
 
 /** The application-facing result after provider success and policy routing. */
 export interface DecisionOutcome<TAnswers> {

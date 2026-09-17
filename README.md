@@ -2,7 +2,7 @@
 
 Production-ready patterns for building probabilistic decision workflows with [TypeSafe AI Jev](https://typesafe.ai/).
 
-> **Status:** pre-alpha. The typed provider, decision contract, and three-route policy engine are available; evaluation, observability, and business fallbacks remain future work.
+> **Status:** pre-alpha. Issues #1–#7 and #9 have an offline implementation and CI path. Live Jev commands are opt-in and have not been run here. Issue #8 is prepared up to, but not including, the license, distribution, version/tag, and publication decisions.
 
 `jev-starter` is not another Jev SDK wrapper. The official `@typesafe-ai/sdk` already provides a typed client. This project focuses on the layer applications still need around the model: **decision contracts, policy thresholds, fallbacks, evaluation, and production examples**.
 
@@ -44,13 +44,13 @@ The goal of this repository is to make that pattern reusable and measurable.
 src/
   core/           decision contracts and engine
   policies/       reusable threshold / routing policies
-  providers/      Jev provider (mock/fallback adapters follow in later issues)
+  providers/      Jev and deterministic mock providers
   observability/  decision events and metrics hooks
 
 evals/
   fixtures/       labeled JSONL datasets
   metrics/        accuracy, calibration, risk/coverage, latency, cost
-  runners/        Jev and baseline evaluation runners
+  runners/        Jev, baseline, comparison, and cascade runners
 
 examples/
   support-routing/
@@ -66,11 +66,11 @@ docs/
   roadmap.md
 ```
 
-## Core flow (source-tree example)
+## Core flow
 
 ```ts
 import { choice } from "@typesafe-ai/sdk";
-import { DecisionEngine, JevProvider, defineDecision } from "./src/index.js";
+import { DecisionEngine, JevProvider, defineDecision } from "jev-starter";
 
 const questions = {
   category: choice("What is this ticket about?", {
@@ -113,7 +113,14 @@ switch (result.route) {
 }
 ```
 
-The example uses a source-tree import because package exports and the build artifact are intentionally deferred to the first public release. `result.answers` contains the complete typed answer map, including choice/score confidence and probabilities or a noul probability. The engine only returns the route; the host application owns every side effect. Provider/API failures and malformed SDK responses reject and do not produce a `DecisionOutcome`.
+For a checkout, run `pnpm build` before using the package-name import; the clean-install package check exercises the same `exports` entry. A source-tree example can instead import from `./src/index.js`. `result.answers` contains the complete typed answer map, including choice/score confidence and probabilities or a noul probability. The engine only returns the route; the host application owns every side effect. Provider/API failures and malformed SDK responses reject and do not produce a `DecisionOutcome`.
+
+## Reference examples
+
+- [Support routing](examples/support-routing/README.md)
+- [Agent decision gate](examples/agent-decision-gate/README.md)
+- [LLM judge guard](examples/llm-judge/README.md)
+- [RAG evaluator showcase](examples/rag-evaluator/README.md)
 
 ## Evaluation target
 
@@ -121,11 +128,16 @@ The starter should make it easy to answer a practical migration question:
 
 > For this classification or decision task, how much traffic can Jev automate at an acceptable error rate compared with the current baseline?
 
-Planned metrics include accuracy, precision/recall where applicable, Brier score, calibration error, coverage/risk across confidence thresholds, AURC where meaningful, latency, and estimated cost.
+The offline harness implements accuracy, confusion matrices, per-label precision/recall/F1, Brier score, weighted ECE, coverage/risk threshold sweeps, binary-band sweeps, risk-coverage/AURC, latency, failures, usage, comparison, and cascade reports. Reports distinguish successful-only accuracy from all-row accuracy and retain combined cascade legs for latency, usage, and model-specific cost. Cost is calculated only from an explicitly supplied versioned pricing snapshot; otherwise it is reported as `unavailable`.
+
+```sh
+pnpm eval:offline
+pnpm eval:live      # requires TYPESAFE_API_KEY; opt-in only
+```
 
 ## Showcase: RAG evaluator
 
-RAG evaluation is planned as the repository's first full showcase rather than a minimal classification demo.
+RAG evaluation is the repository's first full showcase rather than a minimal classification demo. The basic answer-level mode is runnable offline and keeps retrieval and generation judgments separate.
 
 ```text
 Question --------------------+
@@ -138,7 +150,7 @@ Reference answer (optional) -+              v
                                     deterministic diagnosis
 ```
 
-The evaluator will keep retrieval and generation failures separate:
+The evaluator keeps retrieval and generation failures separate and reports accuracy, Brier score, and weighted ECE for each available Jev component:
 
 - chunk relevance;
 - context sufficiency;
@@ -148,7 +160,7 @@ The evaluator will keep retrieval and generation failures separate:
 - contradiction;
 - reference-based correctness when available.
 
-The final diagnosis is composed in TypeScript instead of asking Jev one large opaque question. Planned comparison modes are **Jev-only**, **baseline judge**, and **Jev -> fallback judge cascade** on the same labeled dataset.
+The final diagnosis is composed in TypeScript instead of asking Jev one large opaque question. The comparison modes are **Jev-only**, **baseline judge**, and **Jev -> fallback judge cascade** on the same labeled dataset. The fixture baseline currently exposes only its final diagnosis/confidence, so its component metrics are omitted rather than copied from Jev. Claim extraction remains a host/LLM extension point and is not implemented in basic mode.
 
 See [RAG evaluator showcase](docs/rag-evaluator.md) for the detailed design.
 
@@ -158,6 +170,13 @@ See [RAG evaluator showcase](docs/rag-evaluator.md) for the detailed design.
 - [Decision contract](docs/decision-contract.md)
 - [Evaluation](docs/evaluation.md)
 - [RAG evaluator showcase](docs/rag-evaluator.md)
+- [Upstream compatibility](docs/compatibility.md)
+- [Public API review](docs/public-api.md)
+- [Release checklist](docs/release-checklist.md)
+- [Distribution options](docs/distribution-options.md)
+- [Contributing](CONTRIBUTING.md)
+- [Security](SECURITY.md)
+- [Changelog](CHANGELOG.md)
 - [Roadmap](docs/roadmap.md)
 
 ## Upstream

@@ -1,0 +1,4 @@
+{"id":"agent-001","state":{"fixtureId":"agent-001","action":"continue","confidence":0.96},"expected":"continue"}
+{"id":"agent-002","state":{"fixtureId":"agent-002","action":"tool","confidence":0.72},"expected":"tool"}
+{"id":"agent-003","state":{"fixtureId":"agent-003","action":"fallback","confidence":0.45},"expected":"fallback"}
+{"id":"agent-004","state":{"fixtureId":"agent-004","action":"review","confidence":0.94},"expected":"tool"}
