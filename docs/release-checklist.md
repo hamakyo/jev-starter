@@ -24,13 +24,13 @@ This checklist separates decisions already recorded from the remaining approval-
 - [x] Use package version `0.1.0` and Git tag `v0.1.0`.
 - [x] Assign release ownership to `hamakyo` and prefer GitHub Actions OIDC provenance.
 
-## Required gate before public operation
+## Completed release gate
 
-- [ ] Recheck that the npm name `jev-starter` is still available.
+- [x] Recheck that the npm name `jev-starter` is still available.
 - [x] Confirm that the release owner can authenticate to npm as `hamakyo` with two-factor authentication enabled.
-- [ ] Bootstrap the unclaimed package name with a temporary public `0.0.0` release and deprecate that version.
-- [ ] Configure npm trusted publishing for GitHub user `hamakyo`, repository `jev-starter`, workflow `release.yml`, with direct `npm publish` allowed.
-- [ ] Obtain explicit approval for the `0.0.0` bootstrap/deprecation, approved commit, `v0.1.0` tag, npm `0.1.0` publication, GitHub template setting, and GitHub Release.
+- [x] Bootstrap the unclaimed package name with a temporary public `0.0.0` release and deprecate that version.
+- [x] Configure npm trusted publishing for GitHub user `hamakyo`, repository `jev-starter`, workflow `release.yml`, with direct `npm publish` allowed.
+- [x] Obtain explicit approval for the `0.0.0` bootstrap/deprecation, approved commit, `v0.1.0` tag, npm `0.1.0` publication, GitHub template setting, and GitHub Release.
 
 ## Commands to run after the decisions
 
@@ -46,7 +46,7 @@ pnpm build
 pnpm package:check
 ```
 
-Only after the remaining gate and a separate human approval should the release owner create the tag, enable the template setting, publish the package, or publish a GitHub Release.
+The release owner completed the approved public operations on 2026-09-18.
 
 ## First-package bootstrap
 
@@ -62,3 +62,12 @@ The trusted publisher must match these values exactly:
 - Allowed action: direct `npm publish`
 
 After `v0.1.0` points at the separately approved commit, manually run the release workflow with the tag and full commit SHA. Do not configure `NPM_TOKEN`; the workflow obtains a short-lived OIDC credential and npm generates provenance automatically.
+
+## v0.1.0 result
+
+- Approved package commit: `a420a7431cbf70a2fc1290c052827dae1889c241`
+- npm package: `jev-starter@0.1.0`, published with trusted-publishing provenance
+- npm dist-tag: `latest` points to `0.1.0`
+- Registry clean-install and ESM import: passed
+- Git tag and GitHub Release: `v0.1.0`
+- GitHub repository template setting: enabled
