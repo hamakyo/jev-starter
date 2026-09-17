@@ -20,10 +20,18 @@ interface DecisionDefinition<TQuestions> {
   policy: DecisionPolicy;
 }
 
-interface DecisionPolicy {
-  autoThreshold: number;
-  fallbackThreshold: number;
-}
+type DecisionPolicy =
+  | {
+      kind: "confidence";
+      autoThreshold: number;
+      fallbackThreshold: number;
+    }
+  | {
+      kind: "binary-band";
+      negativeThreshold: number;
+      positiveThreshold: number;
+      uncertainRoute: "fallback" | "review";
+    };
 ```
 
 A host invokes the definition with runtime state:
@@ -39,6 +47,8 @@ const outcome = await engine.decide(ticketRouting, {
 
 The engine combines the runtime state with the contract's questions, calls the configured provider, and applies the policy.
 
+The exact TypeScript API is still a design target. The important invariant is that policy semantics are explicit and versioned with the decision.
+
 ## Why questions live in the contract
 
 Questions and criteria define task semantics. If they change, historical metrics may no longer be comparable. Keeping them in a versioned definition allows:
@@ -50,7 +60,9 @@ Questions and criteria define task semantics. If they change, historical metrics
 
 ## Policy behavior
 
-For responses with a directly reported confidence, the default policy is:
+### Confidence policy
+
+For responses with a directly reported confidence, the default one-sided policy is:
 
 ```ts
 if (confidence >= autoThreshold) return "auto";
@@ -58,7 +70,27 @@ if (confidence >= fallbackThreshold) return "fallback";
 return "review";
 ```
 
-For `noul`, policy code should explicitly define how the yes probability is converted into the confidence of the selected boolean outcome. This must be covered by tests rather than implied.
+This is appropriate when the selected outcome already represents the model's best class and the application mainly cares about confidence in that selection.
+
+### Binary-band policy
+
+For a `noul` response, low `P(true)` is not the same as uncertainty. A low probability can be a confident negative decision.
+
+```ts
+if (pTrue <= negativeThreshold) return "auto";
+if (pTrue >= positiveThreshold) return "auto";
+return uncertainRoute;
+```
+
+The answer map preserves `pTrue`, so the host can distinguish the confident negative from the confident positive. The policy only decides whether the judgment is safe enough to automate.
+
+Required invariant:
+
+```text
+0 <= negativeThreshold < positiveThreshold <= 1
+```
+
+A symmetric pair such as `0.05 / 0.95` may be useful during evaluation but is not a universal default.
 
 ## Multiple questions
 
@@ -67,10 +99,12 @@ A single Jev call can contain multiple named questions. The starter should not s
 Initial implementation options should be explicit, for example:
 
 - route based on one named primary answer;
-- require every configured answer to satisfy its threshold;
+- require every configured answer to satisfy its policy;
 - provide a custom policy function that consumes the complete typed answer map.
 
-The first release should implement the simplest safe option and leave aggregation extensible.
+The RAG evaluator showcase intentionally uses the last pattern for deterministic failure diagnosis: Jev answers atomic questions, while TypeScript composes the full answer map into application policy.
+
+The first release should implement the smallest safe built-ins and leave multi-question composition extensible.
 
 ## Output contract
 
@@ -94,11 +128,12 @@ interface DecisionOutcome<TAnswers> {
 ## Invariants
 
 1. `id` and `version` are required for decisions used in production or evals.
-2. `fallbackThreshold <= autoThreshold`.
-3. Thresholds are within `[0, 1]`.
+2. Confidence-policy thresholds satisfy `0 <= fallbackThreshold <= autoThreshold <= 1`.
+3. Binary-band thresholds satisfy `0 <= negativeThreshold < positiveThreshold <= 1`.
 4. No provider/API failure can produce `route: "auto"`.
-5. Raw state is not retained by the core engine after the call unless the host explicitly adds persistence.
-6. Provider-specific metadata may be attached, but core policy code should depend only on documented normalized fields.
+5. Multiple answers are never silently collapsed into one confidence value.
+6. Raw state is not retained by the core engine after the call unless the host explicitly adds persistence.
+7. Provider-specific metadata may be attached, but core policy code should depend only on documented normalized fields.
 
 ## Example: support routing
 
@@ -115,10 +150,29 @@ const ticketRouting = defineDecision({
     }),
   },
   policy: {
+    kind: "confidence",
     autoThreshold: 0.9,
     fallbackThreshold: 0.65,
   },
 });
 ```
 
-The thresholds above are illustrative only. Real thresholds must be chosen from evaluation data for the specific task.
+## Example: binary verification
+
+```ts
+const groundedness = defineDecision({
+  id: "rag.answer-grounded",
+  version: "1",
+  questions: {
+    grounded: noul("Is the answer fully supported by the retrieved evidence?"),
+  },
+  policy: {
+    kind: "binary-band",
+    negativeThreshold: 0.05,
+    positiveThreshold: 0.95,
+    uncertainRoute: "fallback",
+  },
+});
+```
+
+All thresholds above are illustrative only. Real thresholds must be chosen from evaluation data for the specific task and data distribution.
