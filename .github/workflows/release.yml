@@ -1,0 +1,59 @@
+name: Release npm package
+
+run-name: Release ${{ inputs.tag }} from ${{ inputs.commit }}
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing release tag (for example, v0.1.0)
+        required: true
+        type: string
+      commit:
+        description: Full approved commit SHA
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: npm-release-${{ inputs.tag }}
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    name: Verify and publish
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ inputs.tag }}
+          fetch-depth: 0
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9.15.4
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "24.x"
+          registry-url: https://registry.npmjs.org
+          package-manager-cache: false
+      - name: Verify approved release identity
+        env:
+          APPROVED_COMMIT: ${{ inputs.commit }}
+          RELEASE_TAG: ${{ inputs.tag }}
+        run: |
+          test "$(git rev-parse HEAD)" = "$APPROVED_COMMIT"
+          node -e 'const { version } = require("./package.json"); if (process.env.RELEASE_TAG !== `v${version}`) throw new Error("release tag does not match package version")'
+          node -e 'const [major, minor] = process.argv[1].split(".").map(Number); if (major < 11 || (major === 11 && minor < 5)) throw new Error("npm 11.5.1 or newer is required")' "$(npm --version)"
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm typecheck
+      - run: pnpm lint
+      - run: pnpm test
+      - run: pnpm eval:offline
+      - run: pnpm examples:offline
+      - run: pnpm rag:offline
+      - run: pnpm package:check
+      - name: Publish to npm with trusted publishing
+        run: npm publish --access public
