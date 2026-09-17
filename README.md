@@ -2,7 +2,7 @@
 
 Production-ready patterns for building probabilistic decision workflows with [TypeSafe AI Jev](https://typesafe.ai/).
 
-> **Status:** pre-alpha. Issues #1–#7 and #9 have an offline implementation and CI path. Live Jev commands are opt-in and have not been run here. Issue #8 is prepared up to, but not including, the license, distribution, version/tag, and publication decisions.
+> **Status:** pre-release. Issues #1–#7 and #9 are implemented and verified in offline CI. The opt-in live commands have also completed a smoke run. The first release is planned as `jev-starter@0.1.0` / `v0.1.0`; publication remains a separate approval-gated operation.
 
 `jev-starter` is not another Jev SDK wrapper. The official `@typesafe-ai/sdk` already provides a typed client. This project focuses on the layer applications still need around the model: **decision contracts, policy thresholds, fallbacks, evaluation, and production examples**.
 
@@ -185,4 +185,4 @@ The official JavaScript/TypeScript SDK is [`@typesafe-ai/sdk`](https://github.co
 
 ## License
 
-A license will be selected before the first public package release.
+[MIT](LICENSE) © 2026 hamakyo.

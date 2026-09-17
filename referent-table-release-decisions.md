@@ -1,0 +1,7 @@
+| 出典 | 目的 | 具体対象 | 役割 | 前後関係 | 候補語 | 初出定義 |
+| --- | --- | --- | --- | --- | --- | --- |
+| Issue #8・repository用途 | 利用者が再利用・改変できる条件を明確にする | source、examples、docsを許諾するMIT Licenseとcopyright holder `hamakyo` | 記録 | public releaseより前にrepository rootとpackage metadataへ追加する | license決定 | License決定とは、repositoryと配布物へMITの利用条件および著作権表示を記録することを指す。 |
+| package build・examples | library利用とstarter複製の両方を提供する | npm packageを主配布、GitHub templateを補助配布とする二つの公開面 | 目的 | package clean-installとexamples検証後、公開操作より前に選択する | 配布方式 | 配布方式とは、versioned dependencyとしてのnpm packageと、examplesを含む開始点としてのGitHub templateの両方を使う選択を指す。 |
+| npm registry・package metadata | 初回packageを一意に識別する | 2026-09-18時点でregistry未登録の`jev-starter`、package version `0.1.0`、git tag `v0.1.0` | 記録 | license・配布方式決定後、publish直前のname再確認より前に固定する | 初回version識別子 | 初回version識別子とは、npm package `jev-starter@0.1.0`と対応するgit tag `v0.1.0`の組を指す。 |
+| GitHub repository owner・release checklist | 公開操作の責任範囲を明確にする | `hamakyo`をrelease ownerとし、GitHub Actions OIDC provenanceを使用し、npm publish権限は公開直前に確認する運用 | 記録 | version/tag決定後、tag・publish・GitHub Releaseより前に権限を確認する | 公開責任 | 公開責任とは、release承認、tag、npm公開、GitHub Releaseおよびprovenance設定を`hamakyo`が所有することを指す。 |
+| Issue #4〜#7・#9・最新CI | 完了したcapabilityをGitHub backlogへ反映する | commit `e963310`、Node 20.x/LTS CI、live smoke結果を根拠にしたIssue commentとclose | 事象 | 実装・review・CI・live smoke完了後、Issue #8の公開操作より前に行う | capability Issue完了 | Capability Issue完了とは、受け入れ条件の実装根拠をコメントしIssue #4〜#7・#9をclosedへ変更する事象を指す。 |

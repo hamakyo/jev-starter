@@ -1,21 +1,21 @@
-# Distribution options
+# Distribution decision
 
-The repository is prepared for either a package release or a template-oriented distribution, but no final choice has been made.
+The first release will use both distribution surfaces, with the npm package as the primary reusable dependency and this repository as a GitHub template for application-owned examples and policy customization.
 
-| Option | Strength | Cost / open question |
+| Surface | Role | Release rule |
 | --- | --- | --- |
-| npm package | versioned dependency, `exports`, declarations, and semver-based upgrades | requires a license, release ownership, package naming/version policy, and publication process |
-| GitHub template | easy starting point for examples and application-owned policy | upgrades are less centralized and consumers must manage dependency/build conventions |
-| Both | reusable package plus a discoverable example repository | requires two release surfaces and clear source/package boundaries |
+| npm package | Primary distribution for versioned runtime/types and semver-based upgrades | Publish `jev-starter@0.1.0` only from tag `v0.1.0` after the release checklist passes |
+| GitHub template | Secondary distribution for examples, eval fixtures, and application-owned policy | Enable template use from the same tagged repository state; consumers own later synchronization |
 
-The current package metadata and `dist` build make the npm path technically testable. `pnpm package:check` installs the packed tarball into a temporary clean consumer and verifies `import "jev-starter"`. This is a dry-run validation only.
+The package name remains `jev-starter`; the npm registry returned no existing package for that name when this decision was recorded on 2026-09-18. Availability must be checked again immediately before publication because registry ownership can change. `pnpm package:check` installs the packed tarball into a temporary clean consumer and verifies `import "jev-starter"`.
 
-Before any public operation, maintainers must decide:
+## Release identity and ownership
 
-- the license and copyright policy;
-- npm, template, or both;
-- the first release version and tag;
-- whether the package name and repository metadata are final;
-- the publication and GitHub Release owners.
+- License: MIT, copyright 2026 hamakyo.
+- Package/version: `jev-starter@0.1.0`.
+- Git tag: `v0.1.0`.
+- Release owner: GitHub user `hamakyo`.
+- Provenance: npm publication should use GitHub Actions OIDC trusted publishing/provenance rather than a long-lived npm token when the registry account supports it.
+- Publication permission: confirm the `hamakyo` npm identity or designated npm owner immediately before enabling the release workflow.
 
-Until those decisions are recorded, this repository must not publish or create a public release.
+These decisions do not themselves authorize a tag, npm publication, template setting change, or GitHub Release. Those operations still require the checklist and a separate human approval.

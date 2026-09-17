@@ -25,7 +25,7 @@ The current execution order is intentionally dependency-driven:
 - [x] Define evaluation strategy.
 - [x] Define RAG evaluator showcase design.
 - [x] Document implementation milestones.
-- [ ] Select license.
+- [x] Select the MIT License.
 - [x] Add contribution and security guidance before wider external contribution.
 
 ## M1 — Runnable core
@@ -127,9 +127,9 @@ See [RAG evaluator showcase](rag-evaluator.md) and [#9](https://github.com/hamak
 
 - [x] Review public API surface for unnecessary abstraction.
 - [x] Add `CONTRIBUTING.md`, `SECURITY.md`, changelog, and release process.
-- [x] Add package metadata; license selection remains open.
-- [ ] Select npm package, GitHub template, or both.
-- [ ] Select the release version/tag.
+- [x] Add package metadata and the MIT License.
+- [x] Select npm package plus GitHub template distribution.
+- [x] Select release version `0.1.0` and tag `v0.1.0`.
 - [ ] Publish the package or GitHub Release.
 - [x] Document migration notes for breaking upstream SDK changes.
 

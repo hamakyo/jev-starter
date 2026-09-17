@@ -20,4 +20,4 @@ The root also exports the decision, provider, policy, mock, and observability ty
 - Evaluation runners and report types live under the repository's `evals/` source tree and are used by offline examples; they are not added to the package root in this pre-alpha release.
 - No business action executor, HTTP client, authentication wrapper, retry layer, or telemetry transport is exported.
 
-This review is a pre-release snapshot, not a semver stability promise. Any final release should repeat it after the license and distribution model are selected.
+This review supports the planned `0.1.0` release. The package remains pre-1.0, so semver-compatible breaking changes may be introduced by a later minor release with explicit changelog and migration guidance.
