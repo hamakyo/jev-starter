@@ -2,6 +2,19 @@
 
 This roadmap is organized by capability rather than dates. Issue scope may change as the upstream Jev SDK evolves.
 
+## Implementation issues
+
+The current execution order is intentionally dependency-driven:
+
+1. [#1 Bootstrap the TypeScript workspace and quality checks](https://github.com/hamakyo/jev-starter/issues/1)
+2. [#2 Implement the Jev provider on top of @typesafe-ai/sdk](https://github.com/hamakyo/jev-starter/issues/2)
+3. [#3 Define the typed decision contract and three-route policy engine](https://github.com/hamakyo/jev-starter/issues/3)
+4. [#4 Add MockProvider and deterministic offline test support](https://github.com/hamakyo/jev-starter/issues/4)
+5. [#5 Build the evaluation harness for calibration and selective automation](https://github.com/hamakyo/jev-starter/issues/5)
+6. [#6 Add the three reference decision patterns](https://github.com/hamakyo/jev-starter/issues/6)
+7. [#7 Add production observability and operational fallback semantics](https://github.com/hamakyo/jev-starter/issues/7)
+8. [#8 Prepare the first public release and contributor surface](https://github.com/hamakyo/jev-starter/issues/8)
+
 ## M0 — Project contract
 
 **Goal:** make the intended boundaries obvious before implementation begins.
