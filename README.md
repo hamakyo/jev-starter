@@ -34,6 +34,7 @@ The goal of this repository is to make that pattern reusable and measurable.
 - **Separate inference from policy.** Jev estimates; application code decides what confidence is sufficient for an action.
 - **Side effects stay with the host application.** The starter returns an action recommendation; it does not silently execute business operations.
 - **Uncertainty is a first-class path.** Low-confidence decisions must have an explicit fallback or review route.
+- **Confident negatives are not uncertainty.** Binary judgments should support two-sided thresholds so a low `P(true)` can be treated differently from an ambiguous result.
 - **Evaluate before automating.** Thresholds should be selected from task-specific data, not copied from examples.
 - **Observable by default.** Model, latency, confidence/probabilities, selected policy path, and outcome should be measurable.
 
@@ -48,18 +49,20 @@ src/
 
 evals/
   fixtures/       labeled JSONL datasets
-  metrics/        accuracy, calibration, coverage, latency, cost
+  metrics/        accuracy, calibration, risk/coverage, latency, cost
   runners/        Jev and baseline evaluation runners
 
 examples/
   support-routing/
   agent-decision-gate/
   llm-judge/
+  rag-evaluator/  showcase: RAG diagnosis + Jev/LLM cascade evaluation
 
 docs/
   architecture.md
   decision-contract.md
   evaluation.md
+  rag-evaluator.md
   roadmap.md
 ```
 
@@ -96,13 +99,43 @@ The starter should make it easy to answer a practical migration question:
 
 > For this classification or decision task, how much traffic can Jev automate at an acceptable error rate compared with the current baseline?
 
-Planned metrics include accuracy, precision/recall where applicable, Brier score, calibration error, coverage at confidence threshold, error at confidence threshold, latency, and estimated cost.
+Planned metrics include accuracy, precision/recall where applicable, Brier score, calibration error, coverage/risk across confidence thresholds, AURC where meaningful, latency, and estimated cost.
+
+## Showcase: RAG evaluator
+
+RAG evaluation is planned as the repository's first full showcase rather than a minimal classification demo.
+
+```text
+Question --------------------+
+Retrieved contexts ----------+----> Jev atomic judgments
+Generated answer ------------+              |
+Reference answer (optional) -+              v
+                                    typed probabilities
+                                             |
+                                             v
+                                    deterministic diagnosis
+```
+
+The evaluator will keep retrieval and generation failures separate:
+
+- chunk relevance;
+- context sufficiency;
+- evidence conflict;
+- answer relevance;
+- groundedness;
+- contradiction;
+- reference-based correctness when available.
+
+The final diagnosis is composed in TypeScript instead of asking Jev one large opaque question. Planned comparison modes are **Jev-only**, **baseline judge**, and **Jev -> fallback judge cascade** on the same labeled dataset.
+
+See [RAG evaluator showcase](docs/rag-evaluator.md) for the detailed design.
 
 ## Documentation
 
 - [Architecture](docs/architecture.md)
 - [Decision contract](docs/decision-contract.md)
 - [Evaluation](docs/evaluation.md)
+- [RAG evaluator showcase](docs/rag-evaluator.md)
 - [Roadmap](docs/roadmap.md)
 
 ## Upstream
