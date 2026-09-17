@@ -32,15 +32,15 @@ The current execution order is intentionally dependency-driven:
 
 **Goal:** one typed Jev decision can run end-to-end from TypeScript.
 
-- [ ] Bootstrap Node.js 20+ TypeScript workspace.
-- [ ] Add `@typesafe-ai/sdk` integration.
-- [ ] Implement `JevProvider`.
-- [ ] Implement `defineDecision()` and typed `DecisionEngine`.
-- [ ] Implement one-sided confidence policy.
-- [ ] Implement two-sided binary-band policy for `noul` judgments.
+- [x] Bootstrap Node.js 20+ TypeScript workspace.
+- [x] Add `@typesafe-ai/sdk` integration.
+- [x] Implement `JevProvider`.
+- [x] Implement `defineDecision()` and typed `DecisionEngine`.
+- [x] Implement one-sided confidence policy.
+- [x] Implement two-sided binary-band policy for `noul` judgments.
 - [ ] Add `MockProvider` for deterministic tests.
-- [ ] Validate policy and contract invariants.
-- [ ] Unit tests for provider, policy, and failure semantics.
+- [x] Validate policy and contract invariants.
+- [x] Unit tests for provider, policy, and failure semantics.
 
 **Exit criterion:** a local example can make a Jev call, obtain typed answers, and route the result without business side effects inside the engine. Binary judgments can distinguish confident negative, uncertain, and confident positive regions.
 
@@ -116,7 +116,8 @@ See [RAG evaluator showcase](rag-evaluator.md) and [#9](https://github.com/hamak
 - [ ] Redaction-safe logging guidance.
 - [ ] Abort/timeout propagation tests.
 - [ ] Operational fallback semantics.
-- [ ] Per-label or custom policies.
+- [x] Typed custom/multi-question policy callback.
+- [ ] Per-label or cost-sensitive policies.
 - [ ] Decision version comparison in evals.
 - [ ] CI for lint, typecheck, unit tests, and offline evals.
 

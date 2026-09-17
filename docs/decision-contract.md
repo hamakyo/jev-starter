@@ -10,27 +10,41 @@ The official TypeSafe JavaScript SDK currently accepts a `state` plus named `que
 
 `jev-starter` should preserve those upstream semantics instead of inventing a competing question language.
 
-## Proposed application contract
+## Application contract
 
 ```ts
-interface DecisionDefinition<TQuestions> {
+interface DecisionDefinition<TQuestions extends Questions> {
   id: string;
   version: string;
   questions: TQuestions;
-  policy: DecisionPolicy;
+  policy: DecisionPolicy<TQuestions>;
 }
 
-type DecisionPolicy =
+type ConfidenceQuestionKey<TQuestions extends Questions> = {
+  [K in keyof TQuestions]-?: TQuestions[K] extends ChoiceQuestion | ScoreQuestion ? K : never;
+}[keyof TQuestions];
+
+type NoulQuestionKey<TQuestions extends Questions> = {
+  [K in keyof TQuestions]-?: TQuestions[K] extends NoulQuestion ? K : never;
+}[keyof TQuestions];
+
+type DecisionPolicy<TQuestions extends Questions> =
   | {
       kind: "confidence";
+      question: ConfidenceQuestionKey<TQuestions>;
       autoThreshold: number;
       fallbackThreshold: number;
     }
   | {
       kind: "binary-band";
+      question: NoulQuestionKey<TQuestions>;
       negativeThreshold: number;
       positiveThreshold: number;
       uncertainRoute: "fallback" | "review";
+    }
+  | {
+      kind: "custom";
+      decide(answers: AnswersFor<TQuestions>): "auto" | "fallback" | "review";
     };
 ```
 
@@ -45,9 +59,9 @@ const outcome = await engine.decide(ticketRouting, {
 });
 ```
 
-The engine combines the runtime state with the contract's questions, calls the configured provider, and applies the policy.
+The engine combines the runtime state with the contract's questions, calls the configured provider, and applies the policy. The built-in selector is checked against the question kind when `defineDecision()` runs: confidence policies accept only `choice` or `score`, and binary-band policies accept only `noul`.
 
-The exact TypeScript API is still a design target. The important invariant is that policy semantics are explicit and versioned with the decision.
+The implementation exposes `defineDecision()`, `DecisionEngine.decide()`, and the provider/policy types described above. The important invariant is that policy semantics are explicit and versioned with the decision.
 
 ## Why questions live in the contract
 
@@ -82,7 +96,7 @@ if (pTrue >= positiveThreshold) return "auto";
 return uncertainRoute;
 ```
 
-The answer map preserves `pTrue`, so the host can distinguish the confident negative from the confident positive. The policy only decides whether the judgment is safe enough to automate.
+The answer map preserves the `noul` probability, so the host can distinguish the confident negative from the confident positive. The policy only decides whether the judgment is safe enough to automate.
 
 Required invariant:
 
@@ -104,7 +118,7 @@ Initial implementation options should be explicit, for example:
 
 The RAG evaluator showcase intentionally uses the last pattern for deterministic failure diagnosis: Jev answers atomic questions, while TypeScript composes the full answer map into application policy.
 
-The first release should implement the smallest safe built-ins and leave multi-question composition extensible.
+The first release implements named-question built-ins and a custom policy callback. The callback receives the complete typed answer map, so multi-question composition remains explicit.
 
 ## Output contract
 
@@ -130,7 +144,7 @@ interface DecisionOutcome<TAnswers> {
 1. `id` and `version` are required for decisions used in production or evals.
 2. Confidence-policy thresholds satisfy `0 <= fallbackThreshold <= autoThreshold <= 1`.
 3. Binary-band thresholds satisfy `0 <= negativeThreshold < positiveThreshold <= 1`.
-4. No provider/API failure can produce `route: "auto"`.
+4. No provider/API failure or malformed SDK response can produce `route: "auto"`; such failures reject and produce no outcome.
 5. Multiple answers are never silently collapsed into one confidence value.
 6. Raw state is not retained by the core engine after the call unless the host explicitly adds persistence.
 7. Provider-specific metadata may be attached, but core policy code should depend only on documented normalized fields.
@@ -151,6 +165,7 @@ const ticketRouting = defineDecision({
   },
   policy: {
     kind: "confidence",
+    question: "category",
     autoThreshold: 0.9,
     fallbackThreshold: 0.65,
   },
@@ -168,6 +183,7 @@ const groundedness = defineDecision({
   },
   policy: {
     kind: "binary-band",
+    question: "grounded",
     negativeThreshold: 0.05,
     positiveThreshold: 0.95,
     uncertainRoute: "fallback",

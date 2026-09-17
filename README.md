@@ -2,7 +2,7 @@
 
 Production-ready patterns for building probabilistic decision workflows with [TypeSafe AI Jev](https://typesafe.ai/).
 
-> **Status:** design / pre-alpha. The repository currently defines the architecture and implementation roadmap before the first runnable release.
+> **Status:** pre-alpha. The typed provider, decision contract, and three-route policy engine are available; evaluation, observability, and business fallbacks remain future work.
 
 `jev-starter` is not another Jev SDK wrapper. The official `@typesafe-ai/sdk` already provides a typed client. This project focuses on the layer applications still need around the model: **decision contracts, policy thresholds, fallbacks, evaluation, and production examples**.
 
@@ -38,13 +38,13 @@ The goal of this repository is to make that pattern reusable and measurable.
 - **Evaluate before automating.** Thresholds should be selected from task-specific data, not copied from examples.
 - **Observable by default.** Model, latency, confidence/probabilities, selected policy path, and outcome should be measurable.
 
-## Planned repository layout
+## Repository layout
 
 ```text
 src/
   core/           decision contracts and engine
   policies/       reusable threshold / routing policies
-  providers/      Jev, mock, and fallback provider adapters
+  providers/      Jev provider (mock/fallback adapters follow in later issues)
   observability/  decision events and metrics hooks
 
 evals/
@@ -66,16 +66,38 @@ docs/
   roadmap.md
 ```
 
-## Intended core flow
+## Core flow (source-tree example)
 
 ```ts
-const result = await engine.decide({
-  state,
+import { choice } from "@typesafe-ai/sdk";
+import { DecisionEngine, JevProvider, defineDecision } from "./src/index.js";
+
+const questions = {
+  category: choice("What is this ticket about?", {
+    billing: null,
+    technical: null,
+    other: null,
+  }),
+};
+
+const ticketRouting = defineDecision({
+  id: "support.ticket-routing",
+  version: "1",
   questions,
   policy: {
-    auto: 0.9,
-    fallback: 0.65,
+    kind: "confidence",
+    question: "category",
+    autoThreshold: 0.9,
+    fallbackThreshold: 0.65,
   },
+});
+
+const state = { ticket: { subject: "Duplicate charge", body: "I was charged twice." } };
+const signal = new AbortController().signal;
+const engine = new DecisionEngine(new JevProvider());
+const result = await engine.decide(ticketRouting, state, {
+  signal,
+  timeout: 10_000,
 });
 
 switch (result.route) {
@@ -91,7 +113,7 @@ switch (result.route) {
 }
 ```
 
-The API above is a **design target**, not yet a published API.
+The example uses a source-tree import because package exports and the build artifact are intentionally deferred to the first public release. `result.answers` contains the complete typed answer map, including choice/score confidence and probabilities or a noul probability. The engine only returns the route; the host application owns every side effect. Provider/API failures and malformed SDK responses reject and do not produce a `DecisionOutcome`.
 
 ## Evaluation target
 
