@@ -54,6 +54,6 @@ jobs:
       - run: pnpm eval:offline
       - run: pnpm examples:offline
       - run: pnpm rag:offline
-      - run: pnpm package:check
+      - run: pnpm pack:check
       - name: Publish to npm with trusted publishing
         run: npm publish --access public
