@@ -18,6 +18,7 @@
   "files": [
     "dist",
     "README.md",
+    "README.ja.md",
     "LICENSE",
     "docs/architecture.md",
     "docs/compatibility.md",
