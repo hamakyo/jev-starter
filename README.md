@@ -2,7 +2,7 @@
 
 Production-ready patterns for building probabilistic decision workflows with [TypeSafe AI Jev](https://typesafe.ai/).
 
-> **Status:** `jev-starter@0.1.0` is published on [npm](https://www.npmjs.com/package/jev-starter/v/0.1.0) with provenance, and [`v0.1.0`](https://github.com/hamakyo/jev-starter/releases/tag/v0.1.0) is available as a GitHub Release. This repository is also enabled as a GitHub template. The `main` branch may contain unreleased changes intended for a later version.
+> **Status:** `jev-starter@0.1.1` is published on [npm](https://www.npmjs.com/package/jev-starter/v/0.1.1) with provenance, and [`v0.1.1`](https://github.com/hamakyo/jev-starter/releases/tag/v0.1.1) is available as a GitHub Release. This repository is also enabled as a GitHub template. The `main` branch may contain unreleased changes intended for a later version.
 
 `jev-starter` is not another Jev SDK wrapper. The official `@typesafe-ai/sdk` already provides a typed client. This project focuses on the layer applications still need around the model: **decision contracts, policy thresholds, fallbacks, evaluation, and production examples**.
 
@@ -193,7 +193,7 @@ See [RAG evaluator showcase](docs/rag-evaluator.md) for the detailed design.
 
 The official JavaScript/TypeScript SDK is [`@typesafe-ai/sdk`](https://github.com/typesafe-ai/typesafe-sdk-js). It currently exposes typed `systemOne()` requests and `noul`, `choice`, and `score` question/response shapes.
 
-Future npm versions, tags, and GitHub Releases remain explicit approval-gated operations performed through the documented release workflow. That policy applies to future releases; `v0.1.0` is already public.
+Future npm versions, tags, and GitHub Releases remain explicit approval-gated operations performed through the documented release workflow. That policy applies to future releases; `v0.1.1` is already public.
 
 ## License
 

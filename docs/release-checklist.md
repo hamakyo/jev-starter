@@ -1,6 +1,6 @@
 # Release checklist
 
-This checklist records the completed `v0.1.0` release and the approval-gated process retained for future releases.
+This checklist records the completed `v0.1.0` and `v0.1.1` releases and the approval-gated process retained for future releases.
 
 ## Completed preparation
 
@@ -71,3 +71,11 @@ For `v0.1.0`, the release owner manually ran the release workflow with the appro
 - Registry clean-install and ESM import: passed
 - Git tag and GitHub Release: `v0.1.0`
 - GitHub repository template setting: enabled
+
+## v0.1.1 result
+
+- Approved package commit: `fcb1360239d672a859dc23f9e55ca52900052c0b`
+- npm package: `jev-starter@0.1.1`, published with trusted-publishing provenance
+- npm dist-tag: `latest` points to `0.1.1`
+- Registry clean-install and ESM import: passed
+- Git tag and GitHub Release: `v0.1.1`
