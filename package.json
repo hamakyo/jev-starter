@@ -1,6 +1,6 @@
 {
   "name": "jev-starter",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "type": "module",
   "packageManager": "pnpm@9.15.4",
   "description": "Typed, policy-driven decision workflows on top of the TypeSafe AI Jev SDK",
