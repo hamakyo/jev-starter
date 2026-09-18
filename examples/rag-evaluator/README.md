@@ -9,11 +9,19 @@ The deterministic diagnosis precedence is:
 ```text
 conflict
 -> retrieval miss / insufficient
+-> answer irrelevant
 -> generator ungrounded
 -> answer incorrect
 -> uncertain
 -> pass
 ```
+
+An answer with relevance at or below the fixture's fail threshold is diagnosed
+as `ANSWER_IRRELEVANT`. This is a confident automatic failure, with diagnosis
+confidence `1 - relevance`; it does not use the fallback route. Relevance in
+the open band remains `JUDGE_UNCERTAIN` and uses the fallback route, while
+retrieval failures retain precedence. These thresholds are fixture-calibrated
+examples, not universal safety defaults.
 
 Offline mode compares Jev-only, a deterministic baseline, and a Jev-to-baseline cascade on the same fixture:
 

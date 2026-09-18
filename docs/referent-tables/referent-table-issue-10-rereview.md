@@ -1,0 +1,5 @@
+| 出典 | 目的 | 具体対象 | 役割 | 前後関係 | 候補語 | 初出定義 |
+| --- | --- | --- | --- | --- | --- | --- |
+| P2修正 / `dataset.jsonl:9` | fixtureの自然言語とcomponent ground truthを一致させる | exportsを尋ねる質問にsharingを答え、c2 relevanceとanswer relevanceとcorrectnessをfalse、groundednessをtrueとした`rag-009` | 記録 | question・contexts → irrelevant answer → component labels → final diagnosis | semantically consistent fixture | semantically consistent fixtureとは、自然言語入力から判断できる各componentの正解とfixtureに記録したboolean labelが一致する評価行を指す。 |
+| Issue #10 precedence / `evaluator.test.ts` | 低relevanceと低correctnessが共存しても関連度診断を選ぶことを確認する | `rag-009`のjudgmentsがrelevance `0.1`、groundedness `0.9`、correctness `0.1`で、最終結果が`ANSWER_IRRELEVANT`かつroute `auto`となる観測 | 状態 | retrieval診断なし → answer relevance failure → answer incorrectより先に確定 | end-to-end precedence evidence | end-to-end precedence evidenceとは、fixtureから評価reportまでの経路で診断優先順位が保持されたことを示す観測を指す。 |
+| 再実行結果 | main pushと`v0.1.1`公開前の実装品質を確認する | typecheck、lint、59 tests、offline評価3系統、build、pack、clean-install、`git diff --check`の成功 | 記録 | P2修正後 → 全検証成功 → 追加指摘なし | merge-ready implementation | merge-ready implementationとは、Issue #10の受入条件と回帰検証を満たし、コードレビュー上の追加修正を必要としない作業ツリーを指す。 |

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { diagnoseRag, diagnosisConfidence } from "../../examples/rag-evaluator/src/diagnosis.js";
-import { RAG_THRESHOLDS } from "../../examples/rag-evaluator/src/policy.js";
+import { RAG_POLICY_METADATA, RAG_THRESHOLDS } from "../../examples/rag-evaluator/src/policy.js";
 import type { RagJudgments } from "../../examples/rag-evaluator/src/types.js";
 
 function judgments(
@@ -59,6 +59,99 @@ describe("RAG diagnosis policy", () => {
       ),
     ).toBe("JUDGE_UNCERTAIN");
     expect(diagnoseRag(judgments(), RAG_THRESHOLDS)).toBe("PASS");
+  });
+
+  it("diagnoses answer irrelevance below and at the fail threshold", () => {
+    const below = judgments({
+      generation: { relevance: RAG_THRESHOLDS.failThreshold - 0.01 },
+    });
+    expect(diagnoseRag(below, RAG_THRESHOLDS)).toBe("ANSWER_IRRELEVANT");
+    expect(diagnosisConfidence("ANSWER_IRRELEVANT", below)).toBeCloseTo(
+      1 - below.generation.relevance,
+    );
+
+    const atBoundary = judgments({
+      generation: { relevance: RAG_THRESHOLDS.failThreshold },
+    });
+    expect(diagnoseRag(atBoundary, RAG_THRESHOLDS)).toBe("ANSWER_IRRELEVANT");
+    expect(diagnosisConfidence("ANSWER_IRRELEVANT", atBoundary)).toBeCloseTo(
+      1 - RAG_THRESHOLDS.failThreshold,
+    );
+  });
+
+  it("keeps the relevance uncertainty band open and passes at the pass threshold", () => {
+    const middle = (RAG_THRESHOLDS.failThreshold + RAG_THRESHOLDS.passThreshold) / 2;
+    expect(diagnoseRag(judgments({ generation: { relevance: middle } }), RAG_THRESHOLDS)).toBe(
+      "JUDGE_UNCERTAIN",
+    );
+    expect(
+      diagnoseRag(
+        judgments({ generation: { relevance: RAG_THRESHOLDS.passThreshold } }),
+        RAG_THRESHOLDS,
+      ),
+    ).toBe("PASS");
+  });
+
+  it("keeps retrieval diagnoses ahead of low answer relevance", () => {
+    const lowRelevance = { relevance: RAG_THRESHOLDS.failThreshold };
+    expect(
+      diagnoseRag(
+        judgments({
+          retrieval: { conflict: RAG_THRESHOLDS.passThreshold },
+          generation: lowRelevance,
+        }),
+        RAG_THRESHOLDS,
+      ),
+    ).toBe("CONFLICTING_EVIDENCE");
+    expect(
+      diagnoseRag(
+        judgments({
+          retrieval: {
+            chunkRelevance: { c1: RAG_THRESHOLDS.failThreshold, c2: 0.1 },
+          },
+          generation: lowRelevance,
+        }),
+        RAG_THRESHOLDS,
+      ),
+    ).toBe("RETRIEVAL_MISS");
+    expect(
+      diagnoseRag(
+        judgments({
+          retrieval: { sufficiency: RAG_THRESHOLDS.failThreshold },
+          generation: lowRelevance,
+        }),
+        RAG_THRESHOLDS,
+      ),
+    ).toBe("RETRIEVAL_INSUFFICIENT");
+  });
+
+  it("prioritizes low relevance over later generation diagnoses", () => {
+    expect(
+      diagnoseRag(
+        judgments({
+          generation: {
+            relevance: RAG_THRESHOLDS.failThreshold,
+            groundedness: RAG_THRESHOLDS.failThreshold,
+            contradiction: RAG_THRESHOLDS.passThreshold,
+            correctness: RAG_THRESHOLDS.failThreshold,
+          },
+        }),
+        RAG_THRESHOLDS,
+      ),
+    ).toBe("ANSWER_IRRELEVANT");
+  });
+
+  it("keeps policy metadata aligned with executable precedence", () => {
+    expect(RAG_POLICY_METADATA.diagnosisPrecedence).toEqual([
+      "CONFLICTING_EVIDENCE",
+      "RETRIEVAL_MISS",
+      "RETRIEVAL_INSUFFICIENT",
+      "ANSWER_IRRELEVANT",
+      "GENERATOR_UNGROUNDED",
+      "ANSWER_INCORRECT",
+      "JUDGE_UNCERTAIN",
+      "PASS",
+    ]);
   });
 
   it("keeps the empty-context retrieval miss confidence finite", () => {

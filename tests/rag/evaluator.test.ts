@@ -46,7 +46,7 @@ describe("RAG evaluator showcase", () => {
     const retrieval = jev.componentMetrics.retrieval;
     const generation = jev.componentMetrics.generation;
 
-    expect(jev.dataset.count).toBe(8);
+    expect(jev.dataset.count).toBe(9);
     expect(jev.metadata.decisionVariant).toBe("mixed");
     expect(jev.metrics.classification.overallAccuracy).toBe(1);
     expect(jev.metrics.classification.successfulAccuracy).toBe(1);
@@ -66,7 +66,7 @@ describe("RAG evaluator showcase", () => {
         correctness: expect.any(Object),
       }),
     );
-    expect(generation.correctness?.count).toBe(7);
+    expect(generation.correctness?.count).toBe(8);
 
     for (const metric of [...Object.values(retrieval), ...Object.values(generation)]) {
       expect(metric.count).toBeGreaterThan(0);
@@ -95,15 +95,33 @@ describe("RAG evaluator showcase", () => {
     ).toBeUndefined();
     expect(noReferenceObservation?.metadata).toMatchObject({
       decisionId: "example.rag-evaluator.without-reference",
-      decisionVersion: "1",
+      decisionVersion: "2",
       decisionVariant: "without-reference",
     });
     expect(
       jev.observations.find((observation) => observation.id === "rag-001")?.metadata,
     ).toMatchObject({
       decisionId: "example.rag-evaluator.with-reference",
-      decisionVersion: "1",
+      decisionVersion: "2",
       decisionVariant: "with-reference",
+    });
+
+    const irrelevantObservation = jev.observations.find(
+      (observation) => observation.id === "rag-009",
+    );
+    expect(irrelevantObservation).toMatchObject({
+      predicted: "ANSWER_IRRELEVANT",
+      route: "auto",
+    });
+    expect(irrelevantObservation?.metadata?.judgments).toMatchObject({
+      retrieval: {
+        chunkRelevance: { c1: 0.9, c2: 0.1 },
+      },
+      generation: {
+        relevance: 0.1,
+        groundedness: 0.9,
+        correctness: 0.1,
+      },
     });
   });
 
@@ -125,13 +143,13 @@ describe("RAG evaluator showcase", () => {
       },
     });
     expect(reports.cascade.endToEnd.metrics.usage).toEqual({
-      requests: 9,
-      inputTokens: 404,
-      outputTokens: 74,
+      requests: 10,
+      inputTokens: 448,
+      outputTokens: 82,
     });
     expect(reports.cascade.endToEnd.metrics.cost).toMatchObject({ status: "available" });
     if (reports.cascade.endToEnd.metrics.cost.status === "available") {
-      expect(reports.cascade.endToEnd.metrics.cost.totalUsd).toBeCloseTo(0.000552);
+      expect(reports.cascade.endToEnd.metrics.cost.totalUsd).toBeCloseTo(0.000612);
     }
     expect(reports.baseline.componentMetrics).toBeUndefined();
     expect(reports.cascade.fallback.componentMetrics).toBeUndefined();
@@ -150,12 +168,12 @@ describe("RAG evaluator showcase", () => {
     expect(withReference.jevOnly.metadata).toMatchObject({
       decisionVariant: "with-reference",
       decisionId: "example.rag-evaluator.with-reference",
-      decisionVersion: "1",
+      decisionVersion: "2",
     });
     expect(withoutReference.jevOnly.metadata).toMatchObject({
       decisionVariant: "without-reference",
       decisionId: "example.rag-evaluator.without-reference",
-      decisionVersion: "1",
+      decisionVersion: "2",
     });
     expect(mixed.jevOnly.metadata).toEqual(expect.objectContaining({ decisionVariant: "mixed" }));
     expect(mixed.jevOnly.metadata.decisionId).toBeUndefined();

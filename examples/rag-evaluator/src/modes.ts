@@ -60,7 +60,7 @@ type RagAnswers =
 /** The reference-aware decision asks correctness only when a reference exists. */
 export const ragDecisionWithReference = defineDecision({
   id: "example.rag-evaluator.with-reference",
-  version: "1",
+  version: "2",
   questions: ragQuestionsWithReference,
   policy: {
     kind: "custom",
@@ -73,7 +73,7 @@ export const ragDecisionWithReference = defineDecision({
 /** The reference-free decision excludes the reference-dependent correctness question. */
 export const ragDecisionWithoutReference = defineDecision({
   id: "example.rag-evaluator.without-reference",
-  version: "1",
+  version: "2",
   questions: ragQuestionsWithoutReference,
   policy: {
     kind: "custom",

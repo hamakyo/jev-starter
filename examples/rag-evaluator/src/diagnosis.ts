@@ -14,6 +14,9 @@ export function diagnoseRag(judgments: RagJudgments, thresholds: RagThresholds):
   if (judgments.retrieval.sufficiency <= thresholds.failThreshold) {
     return "RETRIEVAL_INSUFFICIENT";
   }
+  if (judgments.generation.relevance <= thresholds.failThreshold) {
+    return "ANSWER_IRRELEVANT";
+  }
   if (
     judgments.generation.groundedness <= thresholds.failThreshold ||
     judgments.generation.contradiction >= thresholds.passThreshold
@@ -45,6 +48,8 @@ export function diagnosisConfidence(diagnosis: RagDiagnosis, judgments: RagJudgm
       return 1 - judgments.retrieval.sufficiency;
     case "GENERATOR_UNGROUNDED":
       return Math.max(1 - judgments.generation.groundedness, judgments.generation.contradiction);
+    case "ANSWER_IRRELEVANT":
+      return 1 - judgments.generation.relevance;
     case "ANSWER_INCORRECT":
       return 1 - (judgments.generation.correctness ?? 0.5);
     case "JUDGE_UNCERTAIN":

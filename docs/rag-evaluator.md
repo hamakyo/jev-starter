@@ -126,8 +126,30 @@ Initial diagnosis vocabulary:
 - `RETRIEVAL_INSUFFICIENT`;
 - `CONFLICTING_EVIDENCE`;
 - `GENERATOR_UNGROUNDED`;
+- `ANSWER_IRRELEVANT`;
 - `ANSWER_INCORRECT`;
 - `JUDGE_UNCERTAIN`.
+
+The deterministic precedence is:
+
+```text
+CONFLICTING_EVIDENCE
+RETRIEVAL_MISS
+RETRIEVAL_INSUFFICIENT
+ANSWER_IRRELEVANT
+GENERATOR_UNGROUNDED
+ANSWER_INCORRECT
+JUDGE_UNCERTAIN
+PASS
+```
+
+When `generation.relevance <= failThreshold`, the evaluator returns
+`ANSWER_IRRELEVANT` with confidence `1 - relevance` and route `auto`. This is
+a confident automatic failure, not a fallback diagnosis. Relevance strictly
+between the fail and pass thresholds remains `JUDGE_UNCERTAIN`, and relevance
+at or above the pass threshold can pass when the other signals pass. Retrieval
+diagnoses always retain precedence over this generation diagnosis. The
+committed thresholds are fixture-calibrated examples, not universal defaults.
 
 Example policy shape:
 
