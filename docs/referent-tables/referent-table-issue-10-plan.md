@@ -1,0 +1,7 @@
+| 出典 | 目的 | 具体対象 | 役割 | 前後関係 | 候補語 | 初出定義 |
+| --- | --- | --- | --- | --- | --- | --- |
+| Issue #10 Problem / Proposed change | 質問へ明確に答えていない回答を成功扱いしない | `generation.relevance <= failThreshold` のときに返すRAG診断 | 状態 | retrievalの3診断の後、groundedness・correctness診断の前 | `ANSWER_IRRELEVANT` | `ANSWER_IRRELEVANT`とは、回答関連度がfail threshold以下であることを表す最終診断を指す。 |
+| Issue #10 Suggested precedence | retrieval起因の診断をgeneration起因の診断より優先する | `CONFLICTING_EVIDENCE`、`RETRIEVAL_MISS`、`RETRIEVAL_INSUFFICIENT`の判定後に回答関連度を判定する分岐順 | 手段 | conflict → miss → insufficient → irrelevant → ungrounded → incorrect → uncertain → pass | diagnosis precedence | diagnosis precedenceとは、同一観測に複数の失敗信号がある場合に最終診断を一意に決める分岐順を指す。 |
+| Issue #10 confidence calculation | 新しい最終診断の確信度を既存診断と同じ0〜1範囲で示す | `ANSWER_IRRELEVANT`に対する`1 - judgments.generation.relevance` | 値 | `diagnoseRag()`が診断を選択した後、評価観測を作る前 | answer-irrelevance confidence | answer-irrelevance confidenceとは、回答関連度の否定確率を新しい診断のconfidenceとして用いる値を指す。 |
+| Issue #10 report consistency | 新しい診断を型検証・offline評価・永続化された期待値へ一貫して反映する | `RAG_DIAGNOSES`、fixture、baseline label、policy metadata、expected report、component metrics | 記録 | 型とpolicy更新後、`pnpm rag:offline`の期待値照合前 | RAG report contract | RAG report contractとは、診断語彙・policy metadata・dataset・期待reportが共有するJSON互換の記録仕様を指す。 |
+| Issue #10 Release | 公開済み`v0.1.0`からの意味変更を追跡可能にする | reference有無の両decision version、changelog、`v0.1.1`候補 | 記録 | 実装・回帰テスト完了後、別途公開承認を得る前 | diagnosis contract version | diagnosis contract versionとは、同じdecision IDで診断意味が変わったことを識別するversion値を指す。 |
