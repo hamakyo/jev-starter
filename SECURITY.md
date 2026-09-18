@@ -1,6 +1,6 @@
 # Security policy
 
-This project is pre-alpha and should not be treated as a complete security control for production decisions. It provides decision contracts and routing recommendations; the host application remains responsible for authorization, side effects, data handling, and audit retention.
+This project is published but remains pre-1.0 and should not be treated as a complete security control for production decisions. It provides decision contracts and routing recommendations; the host application remains responsible for authorization, side effects, data handling, and audit retention.
 
 ## Reporting a vulnerability
 

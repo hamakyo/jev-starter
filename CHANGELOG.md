@@ -8,6 +8,9 @@ All notable changes to this project will be documented here.
   is now a confident automatic failure with retrieval-first precedence, while
   mid-band relevance remains an uncertain fallback case. The reference-aware
   and reference-free RAG decision contracts are now version `2`.
+- Synchronized the README, roadmap, distribution guidance, and release-facing
+  documentation with the published `jev-starter@0.1.0` / `v0.1.0` state.
+
 ## [0.1.0] - 2026-09-18
 
 - Added a deterministic `MockProvider` with canned, scenario, resolver, scripted, timeout, abort, and error paths.

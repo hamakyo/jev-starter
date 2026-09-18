@@ -175,4 +175,4 @@ pnpm examples:offline
 pnpm rag:offline
 ```
 
-`pnpm eval:live` performs the `TYPESAFE_API_KEY` preflight before constructing a live provider request. It is intentionally separate from CI and has not been run as part of the secretless verification.
+`pnpm eval:live` performs the `TYPESAFE_API_KEY` preflight before constructing a live provider request. It remains intentionally separate from CI. A point-in-time live smoke run was completed during `v0.1.0` release preparation; normal verification remains deterministic and offline.

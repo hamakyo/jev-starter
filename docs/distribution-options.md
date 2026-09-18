@@ -1,13 +1,13 @@
-# Distribution decision
+# Distribution status
 
-The first release will use both distribution surfaces, with the npm package as the primary reusable dependency and this repository as a GitHub template for application-owned examples and policy customization.
+The project uses both distribution surfaces, with the npm package as the primary reusable dependency and this repository as a GitHub template for application-owned examples and policy customization.
 
-| Surface | Role | Release rule |
+| Surface | Role | v0.1.0 status |
 | --- | --- | --- |
-| npm package | Primary distribution for versioned runtime/types and semver-based upgrades | Publish `jev-starter@0.1.0` only from tag `v0.1.0` after the release checklist passes |
-| GitHub template | Secondary distribution for examples, eval fixtures, and application-owned policy | Enable template use from the same tagged repository state; consumers own later synchronization |
+| npm package | Primary distribution for versioned runtime/types and semver-based upgrades | `jev-starter@0.1.0` was published from tag `v0.1.0` through GitHub Actions trusted publishing with provenance |
+| GitHub template | Secondary distribution for examples, eval fixtures, and application-owned policy | Template use is enabled; consumers own later synchronization |
 
-The package name remains `jev-starter`; the npm registry returned no existing package for that name when this decision was recorded on 2026-09-18. Availability must be checked again immediately before publication because registry ownership can change. `pnpm package:check` installs the packed tarball into a temporary clean consumer and verifies `import "jev-starter"`.
+The published package name is `jev-starter`, and npm's `latest` dist-tag points to `0.1.0`. Install it with `pnpm add jev-starter`. `pnpm package:check` installs the packed tarball into a temporary clean consumer and verifies `import "jev-starter"`.
 
 ## Release identity and ownership
 
@@ -15,7 +15,7 @@ The package name remains `jev-starter`; the npm registry returned no existing pa
 - Package/version: `jev-starter@0.1.0`.
 - Git tag: `v0.1.0`.
 - Release owner: GitHub user `hamakyo`.
-- Provenance: npm publication should use GitHub Actions OIDC trusted publishing/provenance rather than a long-lived npm token when the registry account supports it.
-- Publication permission: confirm the `hamakyo` npm identity or designated npm owner immediately before enabling the release workflow.
+- Provenance: npm publication uses GitHub Actions OIDC trusted publishing rather than a long-lived npm token.
+- Publication permission: the npm owner and release owner are `hamakyo`.
 
-These decisions do not themselves authorize a tag, npm publication, template setting change, or GitHub Release. Those operations still require the checklist and a separate human approval.
+The `v0.1.0` publication, template setting, tag, and GitHub Release are complete. Every future version still requires the checklist, an approved commit and version, and separate human approval before public operations run.

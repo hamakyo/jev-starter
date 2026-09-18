@@ -2,7 +2,7 @@
 
 Production-ready patterns for building probabilistic decision workflows with [TypeSafe AI Jev](https://typesafe.ai/).
 
-> **Status:** pre-release. Issues #1–#7 and #9 are implemented and verified in offline CI. The opt-in live commands have also completed a smoke run. The first release is planned as `jev-starter@0.1.0` / `v0.1.0`; publication remains a separate approval-gated operation.
+> **Status:** `jev-starter@0.1.0` is published on [npm](https://www.npmjs.com/package/jev-starter/v/0.1.0) with provenance, and [`v0.1.0`](https://github.com/hamakyo/jev-starter/releases/tag/v0.1.0) is available as a GitHub Release. This repository is also enabled as a GitHub template. The `main` branch may contain unreleased changes intended for a later version.
 
 `jev-starter` is not another Jev SDK wrapper. The official `@typesafe-ai/sdk` already provides a typed client. This project focuses on the layer applications still need around the model: **decision contracts, policy thresholds, fallbacks, evaluation, and production examples**.
 
@@ -27,6 +27,16 @@ auto   fallback   human review
 ```
 
 The goal of this repository is to make that pattern reusable and measurable.
+
+## Install
+
+The published package requires Node.js 20 or newer:
+
+```sh
+pnpm add jev-starter
+```
+
+This repository pins pnpm 9.15.4 for contributor and CI commands. Consumers may use another compatible package manager; the runtime package is ESM and exposes its public API from `jev-starter`.
 
 ## Design principles
 
@@ -113,7 +123,7 @@ switch (result.route) {
 }
 ```
 
-For a checkout, run `pnpm build` before using the package-name import; the clean-install package check exercises the same `exports` entry. A source-tree example can instead import from `./src/index.js`. `result.answers` contains the complete typed answer map, including choice/score confidence and probabilities or a noul probability. The engine only returns the route; the host application owns every side effect. Provider/API failures and malformed SDK responses reject and do not produce a `DecisionOutcome`.
+The example above uses the published package import. For a source checkout, run `pnpm build` before resolving that package entry; repository examples may instead import from `./src/index.js`. The clean-install package check exercises the same `exports` entry. `result.answers` contains the complete typed answer map, including choice/score confidence and probabilities or a noul probability. The engine only returns the route; the host application owns every side effect. Provider/API failures and malformed SDK responses reject and do not produce a `DecisionOutcome`.
 
 ## Reference examples
 
@@ -173,7 +183,7 @@ See [RAG evaluator showcase](docs/rag-evaluator.md) for the detailed design.
 - [Upstream compatibility](docs/compatibility.md)
 - [Public API review](docs/public-api.md)
 - [Release checklist](docs/release-checklist.md)
-- [Distribution options](docs/distribution-options.md)
+- [Distribution status](docs/distribution-options.md)
 - [Contributing](CONTRIBUTING.md)
 - [Security](SECURITY.md)
 - [Changelog](CHANGELOG.md)
@@ -182,6 +192,8 @@ See [RAG evaluator showcase](docs/rag-evaluator.md) for the detailed design.
 ## Upstream
 
 The official JavaScript/TypeScript SDK is [`@typesafe-ai/sdk`](https://github.com/typesafe-ai/typesafe-sdk-js). It currently exposes typed `systemOne()` requests and `noul`, `choice`, and `score` question/response shapes.
+
+Future npm versions, tags, and GitHub Releases remain explicit approval-gated operations performed through the documented release workflow. That policy applies to future releases; `v0.1.0` is already public.
 
 ## License
 

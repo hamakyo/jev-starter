@@ -15,6 +15,8 @@ The current execution order is intentionally dependency-driven:
 7. [#9 Build the RAG evaluator showcase and Jev-to-LLM judge cascade](https://github.com/hamakyo/jev-starter/issues/9)
 8. [#7 Add production observability and operational fallback semantics](https://github.com/hamakyo/jev-starter/issues/7)
 9. [#8 Prepare the first public release and contributor surface](https://github.com/hamakyo/jev-starter/issues/8)
+10. [#10 Handle low answer relevance in RAG diagnosis](https://github.com/hamakyo/jev-starter/issues/10)
+11. [#11 Sync README and roadmap with published v0.1.0 release state](https://github.com/hamakyo/jev-starter/issues/11)
 
 ## M0 — Project contract
 
@@ -130,12 +132,12 @@ See [RAG evaluator showcase](rag-evaluator.md) and [#9](https://github.com/hamak
 - [x] Add package metadata and the MIT License.
 - [x] Select npm package plus GitHub template distribution.
 - [x] Select release version `0.1.0` and tag `v0.1.0`.
-- [ ] Publish the package or GitHub Release.
+- [x] Publish `jev-starter@0.1.0` to npm with provenance, create the `v0.1.0` GitHub Release, and enable the repository as a GitHub template.
 - [x] Document migration notes for breaking upstream SDK changes.
 
 ## Deliberately deferred
 
-These ideas should not block the first useful release:
+These ideas were not required for `v0.1.0` and remain deferred:
 
 - UI/dashboard for evals;
 - hosted telemetry service;

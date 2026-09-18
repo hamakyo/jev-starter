@@ -25,4 +25,4 @@ An upstream SDK change to question or answer shapes is therefore a compatibility
 4. rerun the offline quality gate and package check;
 5. record the migration in the changelog before release.
 
-No compatibility claim is made for unverified live API behavior in this repository.
+Normal CI does not make live API compatibility claims. A point-in-time live smoke run completed during `v0.1.0` release preparation, but upstream behavior can still change independently and must be rechecked for later releases.

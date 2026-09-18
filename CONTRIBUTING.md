@@ -1,6 +1,6 @@
 # Contributing
 
-`jev-starter` is pre-alpha. The public API is intentionally small and may change while the decision contract and the upstream Jev SDK evolve.
+`jev-starter` is published but remains pre-1.0. The public API is intentionally small and may change while the decision contract and the upstream Jev SDK evolve.
 
 ## Development environment
 

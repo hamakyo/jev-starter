@@ -1,6 +1,6 @@
 # Release checklist
 
-This checklist separates decisions already recorded from the remaining approval-gated public operations.
+This checklist records the completed `v0.1.0` release and the approval-gated process retained for future releases.
 
 ## Completed preparation
 
@@ -32,7 +32,7 @@ This checklist separates decisions already recorded from the remaining approval-
 - [x] Configure npm trusted publishing for GitHub user `hamakyo`, repository `jev-starter`, workflow `release.yml`, with direct `npm publish` allowed.
 - [x] Obtain explicit approval for the `0.0.0` bootstrap/deprecation, approved commit, `v0.1.0` tag, npm `0.1.0` publication, GitHub template setting, and GitHub Release.
 
-## Commands to run after the decisions
+## Release verification commands
 
 ```sh
 pnpm install --frozen-lockfile
@@ -48,9 +48,9 @@ pnpm package:check
 
 The release owner completed the approved public operations on 2026-09-18.
 
-## First-package bootstrap
+## Completed first-package bootstrap
 
-npm trusted publishing can be configured only after the package exists. Publish `0.0.0` once with the authenticated `hamakyo` account, deprecate it as a trusted-publishing bootstrap version, and then configure the trusted publisher. The tracked package version remains `0.1.0`; prepare the bootstrap artifact in a temporary directory so the repository and release tag are not changed.
+npm trusted publishing could be configured only after the package existed. The release owner published `0.0.0` once with the authenticated `hamakyo` account, deprecated it as a trusted-publishing bootstrap version, and then configured the trusted publisher. The tracked package version remained `0.1.0`; the bootstrap artifact was prepared in a temporary directory so the repository and release tag were not changed.
 
 The trusted publisher must match these values exactly:
 
@@ -61,7 +61,7 @@ The trusted publisher must match these values exactly:
 - Environment: none
 - Allowed action: direct `npm publish`
 
-After `v0.1.0` points at the separately approved commit, manually run the release workflow with the tag and full commit SHA. Do not configure `NPM_TOKEN`; the workflow obtains a short-lived OIDC credential and npm generates provenance automatically.
+For `v0.1.0`, the release owner manually ran the release workflow with the approved tag and full commit SHA. No `NPM_TOKEN` was configured; the workflow obtained a short-lived OIDC credential and npm generated provenance automatically. Future releases follow the same approval gate with their own version, tag, and commit.
 
 ## v0.1.0 result
 

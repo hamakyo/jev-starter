@@ -120,7 +120,7 @@ Initial implementation options should be explicit, for example:
 
 The RAG evaluator showcase intentionally uses the last pattern for deterministic failure diagnosis: Jev answers atomic questions, while TypeScript composes the full answer map into application policy.
 
-The first release implements named-question built-ins and a custom policy callback. The callback receives the complete typed answer map, so multi-question composition remains explicit.
+The `v0.1.0` contract implements named-question built-ins and a custom policy callback. The callback receives the complete typed answer map, so multi-question composition remains explicit.
 
 ## Output contract
 
